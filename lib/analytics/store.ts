@@ -2,6 +2,7 @@
 
 import type { AnalyticsEvent, EventName } from '@/lib/types';
 import { isEventName } from '@/lib/analytics/events';
+import { sendToAmplitude } from '@/lib/analytics/amplitude';
 
 const EVENTS_KEY = 'spread-studio:events';
 const SESSION_KEY = 'spread-studio:session-id';
@@ -61,6 +62,11 @@ export function track(name: EventName, properties: AnalyticsEvent['properties'] 
     properties,
   };
   writeLiveEvents([...readLiveEvents(), event]);
+  // This .catch() is the call-site half of the two-layer fire-and-forget guarantee
+  // (spec 005). jsdom does not surface a live unhandled-rejection signal for this
+  // specific call site, so no automated test can regress-guard it directly; do not
+  // remove it on the assumption it is redundant with amplitude.ts's own handling.
+  void sendToAmplitude(name, properties).catch(() => {});
   return event;
 }
 
