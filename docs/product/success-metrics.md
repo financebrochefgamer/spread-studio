@@ -17,8 +17,11 @@ Per session:
 2. strategy built - first `template_selected` or `leg_edited` in the session
 3. `strategy_analyzed` - analysis panel rendered with at least one leg
 4. `order_placed` - simulated order confirmed
+5. `position_closed` - position lifecycle completed (added by spec 002)
 
-Target shape for a healthy funnel from seed baseline: 100% / 60% / 45% / 15%.
+Target shape for a healthy funnel from seed baseline: 100% / 60% / 45% / 15% / 5%.
+Seed data predates spec 002, so the seeded stage 5 count is zero until the seed
+dataset is extended; live sessions populate it immediately.
 
 ## Event dictionary
 

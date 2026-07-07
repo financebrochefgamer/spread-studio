@@ -34,11 +34,17 @@ This alone completes the build-order-manage loop and is independently demoable.
 **Acceptance**:
 - Every placed order appears as one open position with underlying, strategy name, legs,
   entry net premium, current model value, and unrealized P&L in dollars.
-- At the base scenario (no shifts), each option leg is valued at the same model mid the
-  chain shows for that strike/type/expiration, so a just-opened position shows a P&L of
-  approximately zero (within rounding).
+- Value and P&L are signed to work for debit and credit positions alike: model value
+  M = sum over legs of signedMark x 100 x quantity, where signedMark is the leg's
+  per-share model value with buy legs positive and sell legs negative. Unrealized
+  P&L = M_now - netPremium_entry. At entry this reduces to approximately zero for both
+  debit and credit positions.
+- Base-scenario leg marks are recomputed with the same priceOption the chain uses
+  (single pricing path), so they match the displayed chain mid within one cent of
+  rounding.
 - Portfolio summary shows total unrealized P&L and net position Greeks (delta, gamma,
-  theta per day, vega per vol point, share-equivalent scale).
+  theta per day, vega per vol point, share-equivalent scale) summed across all open
+  positions. All open positions share the one scenario.
 
 ### User Story 2 - Stress the position with a scenario (Priority: P2)
 
@@ -51,15 +57,28 @@ decay (days forward), vega exposure (vol shift), and directional risk (spot shif
 live numbers instead of abstractions.
 
 **Acceptance**:
-- Spot shift range -30% to +30% (step 1%), vol shift range -20 to +20 vol points
-  (step 1), days forward range 0 to days-to-nearest-expiration (step 1).
-- Repricing: spot' = spot x (1 + shift), per-leg vol' = max(0.01, leg IV + shift),
-  T' = max(0, T - days/365). At T' = 0 an option leg is worth intrinsic value.
-- A visible reset control returns all three to zero.
-- Every adjustment fires the `scenario_adjusted` analytics event (debounced) with the
-  three shift values as properties.
-- With a long option position, increasing days forward with other controls at zero
-  strictly decreases position value (theta is visibly negative).
+- Spot shift range -30 to +30 percent (step 1), vol shift range -20 to +20 vol points
+  (step 1), days forward range 0 to days-to-nearest-expiration among open positions
+  (step 1). Controls hold and emit human units (percent, points, days); formulas
+  convert: spot' = spot x (1 + spot_shift_pct / 100),
+  per-leg vol' = max(0.01, legIV + vol_shift_pts / 100),
+  T' = max(0, T - days_forward / 365). At T' = 0 an option leg is worth intrinsic
+  value under spot' (already built into priceOption; no new pricing path).
+- Each leg's IV is the static entry-chain IV for that strike/type/expiration, captured
+  once. It is NOT re-derived from the chain's term structure as days forward changes;
+  only the vol control moves it. This is a deliberate determinism/simplicity choice.
+- A visible reset control returns all three to zero and fires one `scenario_adjusted`
+  event with zeroed properties.
+- Every adjustment fires the `scenario_adjusted` analytics event (debounced 500ms per
+  the tracking plan) with the three shift values as properties.
+- With a long call position, increasing days forward with other controls at zero
+  strictly decreases position value (long calls always have negative theta here).
+  Note: a deep in-the-money long put can gain value as days pass (positive theta from
+  the rate term); that is correct pricing, not a bug.
+- Limitation, stated for clarity: the shared days-forward bound is the nearest
+  expiration across open positions, so a longer-dated position cannot be driven to its
+  own expiration. Acceptable for v2; revisit with per-position analysis if discovery
+  demands it.
 
 ### User Story 3 - Close a position (Priority: P3)
 
@@ -90,13 +109,20 @@ without it.
 - Orders persisted by v1 (before positions existed) must load as open positions without
   migration.
 - Storage unavailable: page renders with empty data, never throws (constitution rule).
+- Display note: at exactly at-the-money with T' = 0, the model's call delta snaps to 0
+  (intrinsic-value branch). This one-point discontinuity in displayed net delta is
+  accepted; do not special-case it.
 
 ## Requirements *(mandatory)*
 
 ### Functional
 
 - FR-001: Open positions derive from persisted orders; closing writes a closed record.
-  No duplicate source of truth for entry data.
+  No duplicate source of truth for entry data. Persistence: closed records live under
+  localStorage key `spread-studio:closed-positions` with shape
+  { orderId, exitValue, realizedPl, closedAt }. Open positions are the orders list
+  minus the closed set, matched by order id; a matching closed record makes close a
+  no-op (idempotent).
 - FR-002: Valuation uses the existing Black-Scholes engine and chain constants. No new
   pricing code paths; scenario repricing calls the same priceOption used by the chain.
 - FR-003: Stock legs value at shifted spot; their Greeks remain delta-only,
@@ -118,8 +144,12 @@ without it.
   shift spot and observe P&L change, roll days forward and observe decay, close, see
   realized P&L in closed list, verify events on /analytics.
 - Unit tests (Vitest) cover the scenario valuation math: base-scenario round trip
-  (value equals chain mid), intrinsic at expiration, vol floor, theta monotonicity for
-  a long call, portfolio aggregation including stock legs.
+  (value matches chain mid within one cent), intrinsic at expiration, vol floor, theta
+  monotonicity for a long call, a credit position (short premium) whose unrealized P&L
+  is approximately zero at entry and positive as days roll forward, and portfolio
+  aggregation including stock legs.
+- The Playwright journey asserts the P&L sign for short premium: a credit position
+  gains as days forward increases.
 - The page follows the v1 visual language and testid conventions; testids are the e2e
   contract and are enumerated in plan.md.
 
@@ -127,8 +157,9 @@ without it.
 
 - SC-1: A visitor can complete the full loop (build, order, position, stress, close) in
   under two minutes with no instructions.
-- SC-2: Funnel extension is measurable: sessions reaching `position_closed` are visible
-  on /analytics alongside the existing funnel.
+- SC-2: The activation funnel gains a fifth stage: `position_closed` is added to the
+  funnel definition in docs/product/success-metrics.md (updated in this PR), and the
+  /analytics funnel and live-session panel render it.
 - SC-3: The theta story is demoable in one gesture: drag days forward, watch a short
   premium position gain and a long premium position decay.
 - SC-4: CI green; live demo verified end to end after deploy.
