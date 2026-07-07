@@ -137,17 +137,17 @@ and state. User story work must wait until this phase is complete.
 
 **Purpose**: Prove the full product journey, publish the repo, and prepare portfolio materials.
 
-- [ ] T042 [P] Write Playwright journey and save/load tests in `tests/e2e/journey.spec.ts`
-- [ ] T043 Run and fix the full local suite using `npm run test`, `npm run build`, and `npm run test:e2e`
-- [ ] T044 [P] Add GitHub Actions CI in `.github/workflows/ci.yml`
-- [ ] T045 [P] Add screenshot capture test in `tests/e2e/screenshots.spec.ts`
-- [ ] T046 Create README and process narrative in `README.md` and `docs/process/ai-workflow.md`
-- [ ] T047 Capture README screenshots in `docs/images/`
-- [ ] T048 Add remote-base-url e2e support in `playwright.config.ts`
+- [x] T042 [P] Write Playwright journey and save/load tests in `tests/e2e/journey.spec.ts`
+- [x] T043 Run and fix the full local suite using `npm run test`, `npm run build`, and `npm run test:e2e`
+- [x] T044 [P] Add GitHub Actions CI in `.github/workflows/ci.yml`
+- [x] T045 [P] Add screenshot capture test in `tests/e2e/screenshots.spec.ts`
+- [x] T046 Create README and process narrative in `README.md` and `docs/process/ai-workflow.md`
+- [x] T047 Capture README screenshots in `docs/images/`
+- [x] T048 Add remote-base-url e2e support in `playwright.config.ts`
 - [ ] T049 Publish to GitHub and update README badge in `README.md`
 - [ ] T050 Deploy to Vercel and update live demo URL in `README.md`
 - [ ] T051 Verify production with Playwright against `PLAYWRIGHT_BASE_URL`
-- [ ] T052 Create local interview talking points in `D:\spread-studio-notes\interview-talking-points.md`
+- [x] T052 Create local interview talking points in `D:\spread-studio-notes\interview-talking-points.md`
 
 ## Dependencies And Execution Order
 
