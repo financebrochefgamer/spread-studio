@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "spread-studio-analytics": {
+      "command": "npx",
+      "args": ["tsx", "mcp/server.ts"],
+      "cwd": "/absolute/path/to/spread-studio"
+    }
+  }
+}

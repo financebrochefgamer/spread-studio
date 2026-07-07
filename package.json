@@ -9,14 +9,17 @@
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "mcp": "tsx mcp/server.ts"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
     "lucide-react": "^0.468.0",
     "next": "^15.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "recharts": "^3.9.2",
+    "zod": "^3.24.0",
     "zustand": "^5.0.0"
   },
   "devDependencies": {
@@ -29,6 +32,7 @@
     "eslint": "^9.17.0",
     "eslint-config-next": "^15.0.0",
     "tailwindcss": "^4.0.0",
+    "tsx": "^4.19.0",
     "typescript": "^5.7.0",
     "vitest": "^4.1.10"
   },
