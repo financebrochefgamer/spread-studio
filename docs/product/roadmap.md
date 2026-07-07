@@ -22,6 +22,23 @@ demo with CI green.
   across two rounds, plan, tasks, implementation reviewed and merged, deployed, and
   verified end to end in production.
 
+## v4: Self-service analytics infrastructure
+
+- Analytics MCP server. Shipped 2026-07-07 as specs/004-analytics-mcp-server: a
+  local, read-only, stdio-transport MCP server exposing the activation funnel,
+  template popularity, and event counts as three typed tools over the deterministic
+  seed dataset, reusing the existing lib/analytics/funnel.ts functions rather than
+  reimplementing them. Directly maps to the target posting's "self-service analytics
+  dashboards ... using internal MCP connections." Ran the full cycle: spec PR
+  reviewed to APPROVE across two rounds (one Blocking finding: an early draft claimed
+  the live page rendered conversion percentages it does not; fixed by scoping the
+  percentage field as a tool-only derived value with its own stated formula),
+  implementation reviewed and merged. No deploy step: this server is a standalone
+  local process, not part of the Vercel-deployed web app.
+- Real Amplitude destination for the existing event taxonomy remains deferred (see
+  v2 above); the MCP server proves the "own dashboards" capability without needing a
+  live vendor integration first.
+
 ## v3: Breadth
 
 - Futures chains and futures options. Margin and tick conventions differ enough to be

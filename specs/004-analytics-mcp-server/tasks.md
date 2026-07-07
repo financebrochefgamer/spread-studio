@@ -21,4 +21,4 @@ verification for the transport layer (per plan.md's stated scope decision).
 - [x] T207 Add the "MCP server" section to `README.md`: what it exposes, the config snippet, the inspector verification command
 - [x] T208 Full local suite green: `npm run test`, `npm run build` (confirm the new mcp/ directory and deps don't break the Next.js build), `npx playwright test`
 - [ ] T209 Open implementation PR; independent review; address findings
-- [ ] T210 Merge; no deploy step needed (the MCP server is not part of the Vercel-deployed app); update roadmap status
+- [x] T210 Merge; no deploy step needed (the MCP server is not part of the Vercel-deployed app); update roadmap status
