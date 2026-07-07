@@ -37,6 +37,8 @@ dataset is extended; live sessions populate it immediately.
 | `strategy_saved` | strategy saved to list | `underlying`, `legs` |
 | `scenario_adjusted` | scenario control changed on /positions, debounced 500ms (spec 002) | `spot_shift_pct`, `vol_shift_pts`, `days_forward` |
 | `position_closed` | open position closed at base scenario (spec 002) | `underlying`, `legs`, `realized_pl` |
+| `working_order_placed` | limit order confirmed but not marketable (spec 006) | `underlying`, `legs`, `net_limit_price` |
+| `working_order_canceled` | working order canceled by the trader (spec 006) | `underlying`, `legs` |
 
 ## Implementation notes
 
