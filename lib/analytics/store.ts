@@ -66,5 +66,9 @@ export function track(name: EventName, properties: AnalyticsEvent['properties'] 
 
 export function clearLiveEvents(): void {
   if (!hasWindow()) return;
-  window.localStorage.removeItem(EVENTS_KEY);
+  try {
+    window.localStorage.removeItem(EVENTS_KEY);
+  } catch {
+    // Storage may be blocked; clearing is best-effort.
+  }
 }
