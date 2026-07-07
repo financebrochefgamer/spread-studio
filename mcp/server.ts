@@ -2,7 +2,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
 import { seededEvents } from '@/lib/analytics/seed';
-import { getEventCountsResult, getFunnelResult, getTemplatePopularityResult } from './handlers';
+import { getEventCountsResult, getFunnelResult, getTemplatePopularityResult, isInvalidLimit } from './handlers';
 
 // Read-only, local, stdio-transport MCP server over this repo's deterministic
 // seeded analytics dataset (spec 004). No write tools, no network port, no
@@ -43,7 +43,7 @@ server.registerTool(
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   },
   async ({ limit }) => {
-    if (limit !== undefined && !(Number.isInteger(limit) && limit > 0)) {
+    if (isInvalidLimit(limit)) {
       return { content: [{ type: 'text', text: 'limit must be a positive integer' }], isError: true };
     }
     const result = getTemplatePopularityResult(seededEvents(), limit);

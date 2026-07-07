@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { countEventsByName, templatePopularity } from '@/lib/analytics/funnel';
 import { EVENT_NAMES } from '@/lib/analytics/events';
 import { seededEvents } from '@/lib/analytics/seed';
-import { getEventCountsResult, getFunnelResult, getTemplatePopularityResult } from '@/mcp/handlers';
+import { getEventCountsResult, getFunnelResult, getTemplatePopularityResult, isInvalidLimit } from '@/mcp/handlers';
 
 describe('mcp handlers', () => {
   it('getFunnelResult returns reference counts and percentOfChainViewed from seeded data', () => {
@@ -77,5 +77,13 @@ describe('mcp handlers', () => {
     for (const name of EVENT_NAMES) {
       expect(result[name]).toBe(0);
     }
+  });
+
+  it('isInvalidLimit rejects zero and non-integers, accepts positive integers and undefined', () => {
+    expect(isInvalidLimit(0)).toBe(true);
+    expect(isInvalidLimit(1.5)).toBe(true);
+    expect(isInvalidLimit(-1)).toBe(true);
+    expect(isInvalidLimit(1)).toBe(false);
+    expect(isInvalidLimit(undefined)).toBe(false);
   });
 });

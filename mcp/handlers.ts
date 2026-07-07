@@ -27,6 +27,13 @@ export function getTemplatePopularityResult(
   return limit === undefined ? all : all.slice(0, limit);
 }
 
+// Positive-integer rule enforced here, not via zod schema rejection, so the
+// resulting isError shape is a controlled tool-result, not an SDK implementation
+// detail (spec acceptance criterion for the limit argument).
+export function isInvalidLimit(limit: number | undefined): boolean {
+  return limit !== undefined && !(Number.isInteger(limit) && limit > 0);
+}
+
 export function getEventCountsResult(events: AnalyticsEvent[]): Record<EventName, number> {
   const partial = countEventsByName(events);
   const result = {} as Record<EventName, number>;

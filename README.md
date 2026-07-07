@@ -110,6 +110,15 @@ verification, the inspector also has a `--cli` mode:
 npx @modelcontextprotocol/inspector --cli npx tsx mcp/server.ts --method tools/call --tool-name get_funnel
 ```
 
+On Windows/git-bash, nested `npx` process spawning can fail inside the inspector's
+own spawn logic (unrelated to this repo). If the command above errors with a
+`Connection closed` or `Failed to find executable` message, point the inspector at
+`tsx` directly instead of through a second `npx`:
+
+```bash
+npx @modelcontextprotocol/inspector --cli node ./node_modules/tsx/dist/cli.mjs mcp/server.ts --method tools/call --tool-name get_funnel
+```
+
 ## Disclaimers
 
 All market data is simulated. Orders are simulated. Nothing here is investment advice or a
