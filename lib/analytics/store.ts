@@ -18,18 +18,22 @@ function makeId(prefix: string): string {
 
 export function getSessionId(): string {
   if (!hasWindow()) return 'server-session';
-  const existing = window.sessionStorage.getItem(SESSION_KEY);
-  if (existing) return existing;
-  const id = makeId('session');
-  window.sessionStorage.setItem(SESSION_KEY, id);
-  return id;
+  try {
+    const existing = window.sessionStorage.getItem(SESSION_KEY);
+    if (existing) return existing;
+    const id = makeId('session');
+    window.sessionStorage.setItem(SESSION_KEY, id);
+    return id;
+  } catch {
+    return makeId('session');
+  }
 }
 
 export function readLiveEvents(): AnalyticsEvent[] {
   if (!hasWindow()) return [];
-  const raw = window.localStorage.getItem(EVENTS_KEY);
-  if (!raw) return [];
   try {
+    const raw = window.localStorage.getItem(EVENTS_KEY);
+    if (!raw) return [];
     const parsed = JSON.parse(raw) as AnalyticsEvent[];
     return Array.isArray(parsed) ? parsed.filter((event) => isEventName(event.name)) : [];
   } catch {
@@ -39,7 +43,11 @@ export function readLiveEvents(): AnalyticsEvent[] {
 
 export function writeLiveEvents(events: AnalyticsEvent[]): void {
   if (!hasWindow()) return;
-  window.localStorage.setItem(EVENTS_KEY, JSON.stringify(events.slice(-EVENT_LIMIT)));
+  try {
+    window.localStorage.setItem(EVENTS_KEY, JSON.stringify(events.slice(-EVENT_LIMIT)));
+  } catch {
+    // storage unavailable (e.g. private mode) - no-op
+  }
 }
 
 export function track(name: EventName, properties: AnalyticsEvent['properties'] = {}): AnalyticsEvent | null {

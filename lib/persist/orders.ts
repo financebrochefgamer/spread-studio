@@ -20,7 +20,11 @@ export function readOrders(): Order[] {
 
 export function writeOrders(orders: Order[]): void {
   if (!hasWindow()) return;
-  window.localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
+  try {
+    window.localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
+  } catch {
+    // storage unavailable (e.g. private mode) - no-op
+  }
 }
 
 export function addOrder(order: Order): void {

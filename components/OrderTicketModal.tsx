@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { Check } from 'lucide-react';
 import type { Leg, Order } from '@/lib/types';
 import { addOrder } from '@/lib/persist/orders';
@@ -21,10 +22,17 @@ function makeId(): string {
 }
 
 export function OrderTicketModal({ open, underlyingSymbol, expiration, legs, onClose }: Props) {
+  const [placed, setPlaced] = useState(false);
+
+  useEffect(() => {
+    if (open) setPlaced(false);
+  }, [open]);
+
   if (!open) return null;
   const netPremium = strategyNetPremium(legs);
 
   const confirm = () => {
+    if (placed) return;
     const order: Order = {
       id: makeId(),
       createdAt: new Date().toISOString(),
@@ -35,6 +43,7 @@ export function OrderTicketModal({ open, underlyingSymbol, expiration, legs, onC
     };
     addOrder(order);
     track('order_placed', { underlying: underlyingSymbol, legs: legs.length, net_premium: netPremium });
+    setPlaced(true);
   };
 
   return (
@@ -64,12 +73,17 @@ export function OrderTicketModal({ open, underlyingSymbol, expiration, legs, onC
           </div>
           <button
             data-testid="confirm-order"
-            className="inline-flex w-full items-center justify-center gap-2 rounded bg-sky-500 px-3 py-2 text-sm font-semibold text-zinc-950 hover:bg-sky-400"
+            className={
+              placed
+                ? 'inline-flex w-full cursor-default items-center justify-center gap-2 rounded bg-emerald-600 px-3 py-2 text-sm font-semibold text-zinc-950'
+                : 'inline-flex w-full items-center justify-center gap-2 rounded bg-sky-500 px-3 py-2 text-sm font-semibold text-zinc-950 hover:bg-sky-400'
+            }
             onClick={confirm}
+            disabled={placed}
             type="button"
           >
             <Check size={16} aria-hidden="true" />
-            Confirm
+            {placed ? 'Order placed' : 'Confirm'}
           </button>
         </div>
       </div>

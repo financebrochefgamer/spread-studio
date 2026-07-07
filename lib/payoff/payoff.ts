@@ -95,11 +95,12 @@ function legGreeks(leg: Leg): Greeks {
   }
   const direction = leg.side === 'buy' ? 1 : -1;
   const greeks = leg.quote?.greeks ?? zeroGreeks();
+  const factor = direction * leg.quantity * CONTRACT_MULTIPLIER;
   return {
-    delta: greeks.delta * direction * leg.quantity,
-    gamma: greeks.gamma * direction * leg.quantity,
-    theta: greeks.theta * direction * leg.quantity,
-    vega: greeks.vega * direction * leg.quantity,
+    delta: greeks.delta * factor,
+    gamma: greeks.gamma * factor,
+    theta: greeks.theta * factor,
+    vega: greeks.vega * factor,
   };
 }
 

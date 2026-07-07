@@ -68,4 +68,17 @@ describe('payoff analysis', () => {
     expect(analysis.maxProfit).toBe(700);
     expect(analysis.breakevens).toContain(103);
   });
+
+  it('aggregates covered call greeks with the contract multiplier applied to option legs', () => {
+    const stockLeg: Leg = { id: 'stock', instrument: 'stock', side: 'buy', quantity: 100, stockPrice: 100 };
+    const callLeg = optionLeg('short-call', 'sell', 'call', 105, 2);
+    const callGreeks = callLeg.quote!.greeks;
+
+    const analysis = analyzeStrategy(strategy([stockLeg, callLeg]));
+
+    expect(analysis.greeks.delta).toBeCloseTo(100 - 100 * callGreeks.delta, 5);
+    expect(analysis.greeks.gamma).toBeCloseTo(callGreeks.gamma * -100, 5);
+    expect(analysis.greeks.theta).toBeCloseTo(callGreeks.theta * -100, 5);
+    expect(analysis.greeks.vega).toBeCloseTo(callGreeks.vega * -100, 5);
+  });
 });

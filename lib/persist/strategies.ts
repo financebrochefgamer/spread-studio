@@ -20,7 +20,11 @@ export function readStrategies(): SavedStrategy[] {
 
 export function writeStrategies(strategies: SavedStrategy[]): void {
   if (!hasWindow()) return;
-  window.localStorage.setItem(STRATEGIES_KEY, JSON.stringify(strategies));
+  try {
+    window.localStorage.setItem(STRATEGIES_KEY, JSON.stringify(strategies));
+  } catch {
+    // storage unavailable (e.g. private mode) - no-op
+  }
 }
 
 export function addSavedStrategy(strategy: SavedStrategy): void {
