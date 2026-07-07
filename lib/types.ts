@@ -21,7 +21,9 @@ export type EventName =
   | 'strategy_analyzed'
   | 'order_ticket_opened'
   | 'order_placed'
-  | 'strategy_saved';
+  | 'strategy_saved'
+  | 'scenario_adjusted'
+  | 'position_closed';
 
 export interface Greeks {
   delta: number;
@@ -109,6 +111,13 @@ export interface Order {
   expiration: string;
   legs: Leg[];
   netPremium: number;
+}
+
+export interface ClosedPosition {
+  orderId: string;
+  exitValue: number;
+  realizedPl: number;
+  closedAt: string;
 }
 
 export interface SavedStrategy {
