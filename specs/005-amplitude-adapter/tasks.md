@@ -6,7 +6,7 @@ store.ts integration; both are unit tests, no e2e changes (per spec's stated sco
 
 ## Phase 1: Dependencies and the pure adapter module (TDD)
 
-- [ ] T301 Add `@amplitude/analytics-browser` (dependency) and `jsdom` (devDependency) to `package.json`; `npm install`
+- [x] T301 Add `@amplitude/analytics-browser` (dependency) and `jsdom` (devDependency) to `package.json`; `npm install`
 - [ ] T302 [TDD] Write failing tests 1-5 from plan.md in `tests/unit/amplitude.test.ts`, then implement `lib/analytics/amplitude.ts` (sendToAmplitude, resetAmplitudeStateForTests) until green
 
 ## Phase 2: store.ts integration (TDD)
