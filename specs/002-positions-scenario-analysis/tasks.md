@@ -23,5 +23,5 @@
 
 - [x] T111 New `tests/e2e/positions.spec.ts` per plan.md e2e scenario (credit position, theta gesture, close, analytics)
 - [x] T112 Full local suite green: `npm run test`, `npm run build`, `npx playwright test`
-- [ ] T113 Open implementation PR; independent review; address findings
-- [ ] T114 Merge, deploy to Vercel, verify production e2e, update README feature list and roadmap status, refresh local talking points
+- [x] T113 Open implementation PR; independent review; address findings
+- [x] T114 Merge, deploy to Vercel, verify production e2e, update README feature list and roadmap status, refresh local talking points
