@@ -39,8 +39,12 @@ the feature is not shippable regardless of how well Amplitude tracking itself wo
   exactly as it does today (same return value, same shape, same session/event id
   behavior) and does not import or execute any Amplitude SDK code.
 - The Amplitude SDK package is dynamically imported only inside the code path that
-  runs when the key is present, so it adds zero bytes to the page's initial bundle
-  when unset (verified by the SDK module never being requested in that path).
+  runs when the key is present. Two separate claims, verified two separate ways: unit
+  tests verify the mocked `init`/`track` functions are never called when the key is
+  absent (the observable behavior); a bundle-analysis check of `npm run build`'s
+  output verifies the SDK adds no weight to the page's initial JS when unset (the
+  build-output claim), recorded as evidence in the implementation report rather than
+  asserted as a unit test outcome.
 - All existing tests (36 unit, 3 e2e) continue to pass unmodified in behavior; the
   public Vercel deployment, which does not set this env var, is unaffected.
 
@@ -58,10 +62,16 @@ already defined in the tracking plan. No second event taxonomy, no renamed prope
   concept this repo invents): this repo already manually instruments every event it
   cares about, and autocapture would introduce untracked-plan events that break
   "event names and properties must match the tracking plan exactly" (constitution).
-- Sending to Amplitude never throws, never blocks, and never rejects unhandled: it is
-  fire-and-forget from `track()`'s perspective. If Amplitude's SDK throws or its
-  promise rejects, `track()` still returns its normal value and localStorage still
-  gets the event, unaffected.
+- Sending to Amplitude never throws, never blocks, and never produces an unhandled
+  promise rejection. The mechanism is explicit, not implicit: omitting `await` alone
+  does NOT prevent an unhandled rejection (a promise that rejects with nothing
+  attached to it still surfaces as an unhandled rejection, a browser console error or
+  a Node `unhandledRejection` event). The module must wrap every step that can fail
+  (the dynamic `import()` of the SDK, `init()`, and `track()`) in try/catch for
+  synchronous throws AND attach a no-op rejection handler (e.g. `.catch(() => {})`)
+  to every promise it produces or receives, so nothing is ever left unhandled.
+  `track()` still returns its normal value and localStorage still gets the event,
+  unaffected, regardless of what Amplitude's SDK does.
 - The Amplitude call uses the exact event name (an `EventName` from
   lib/analytics/events.ts) and the exact properties object already passed to
   `track()`. No transformation, no renaming.
@@ -76,10 +86,15 @@ already defined in the tracking plan. No second event taxonomy, no renamed prope
 - Key present in a server-side render context (no `window`): `track()` already returns
   `null` and no-ops when `!hasWindow()` (lib/analytics/store.ts:54); this spec does
   not change that guard, so Amplitude is never touched server-side either.
-- Because this app's routes prerender as static content, `NEXT_PUBLIC_*` env vars are
-  inlined at Vercel build time, not read at runtime. Setting the key later requires a
-  rebuild and redeploy; this is a build-time flag, not a runtime toggle, and is stated
-  here rather than discovered later as a surprise.
+- `NEXT_PUBLIC_*` env vars are inlined into the client JavaScript bundle at build
+  time; this is a property of Next.js's client-bundle transform itself, not of
+  whether a given route is statically prerendered (this app does not use
+  `output: 'export'`; it runs standard Next.js on Vercel with per-route static
+  optimization, confirmed against next.config.ts). Because `lib/analytics/store.ts`
+  and the new Amplitude module are client code (`'use client'`), the key is baked in
+  at build time regardless. Setting the key later requires a rebuild and redeploy;
+  this is a build-time flag, not a runtime toggle, and is stated here rather than
+  discovered later as a surprise.
 
 ## Requirements *(mandatory)*
 
@@ -87,14 +102,26 @@ already defined in the tracking plan. No second event taxonomy, no renamed prope
 
 - FR-001: New module `lib/analytics/amplitude.ts`, the only file that imports
   `@amplitude/analytics-browser`. No other file in the repo references the Amplitude
-  package directly.
+  package directly. `@amplitude/analytics-browser` is added as a new runtime
+  dependency (it is not present today); `jsdom` is added as a new dev dependency for
+  the one test file that needs a DOM (see Non-functional). The plan phase must verify
+  the SDK's actual current `init`/`track`/`autocapture` API against its official
+  documentation before writing code against it, per this repo's own process lesson
+  (docs/process/playbook.md) about not assuming a third-party API from memory.
 - FR-002: `lib/analytics/store.ts`'s existing `track()` function calls into this
   module after its existing localStorage write, unconditionally (the module itself
   decides whether the key is present and whether to do anything). `track()`'s
   signature, return value, and localStorage behavior are unchanged by this spec.
 - FR-003: The module reads `process.env.NEXT_PUBLIC_AMPLITUDE_API_KEY` at call time
   (not cached at import time in a way that defeats testing); if absent or empty,
-  every exported function is a no-op that does not import the SDK.
+  every exported function is a no-op that does not import the SDK. The module's own
+  functions take the values they need as arguments (event name, properties) and do
+  not call `hasWindow()` or otherwise require a browser DOM themselves; the existing
+  `hasWindow()` guard in `track()` already prevents this module from ever being
+  reached during server-side rendering, so the module itself has no reason to depend
+  on `window`. This is a testability requirement, not just a style preference: it is
+  what makes the module unit-testable under this repo's existing Node test
+  environment (see Non-functional).
 - FR-004: No new events, no new properties, no changes to
   docs/product/success-metrics.md. This spec wires the existing taxonomy to a second
   destination; it does not extend the taxonomy.
@@ -109,13 +136,25 @@ already defined in the tracking plan. No second event taxonomy, no renamed prope
   network calls, zero new imported code. The constitution's determinism principle is
   satisfied by construction, not by a runtime check that could fail.
 - Unit tests mock `@amplitude/analytics-browser` entirely (no real network access from
-  any test, ever, key present or not). Tests cover: key absent means the SDK module is
-  never imported and `init`/`track` are never called; key present means `init` is
-  called exactly once across multiple `track()` calls (idempotent) with autocapture
-  disabled, and `track` is called with the exact event name and properties passed to
-  the app's `track()` function; a mocked Amplitude `track` that throws does not
-  propagate out of the app's `track()` function and does not prevent the localStorage
-  write.
+  any test, ever, key present or not). This repo's existing Vitest config runs a Node
+  environment (no DOM); testing is split across exactly two files to work within
+  that, rather than adding a DOM environment to the whole suite:
+  - `tests/unit/amplitude.test.ts`, plain Node environment (per FR-003, the module
+    needs no `window`), tests the new module directly: key absent means the SDK
+    mock's `init`/`track` are never called; key present means `init` is called
+    exactly once across multiple calls (idempotent, using module reset between test
+    cases so this state doesn't leak into other tests) with autocapture disabled, and
+    the mocked `track` receives the exact event name and properties passed in; a
+    mocked `track` that throws synchronously does not propagate; a mocked `track`
+    that returns a rejecting promise produces no unhandled rejection (Vitest would
+    otherwise surface this as a failure) and does not propagate either.
+  - One integration test file using a `// @vitest-environment jsdom` directive (this
+    spec adds `jsdom` as a new devDependency) verifies `track()` in
+    `lib/analytics/store.ts` actually calls into the new module (mocked) after its
+    localStorage write, and that a throwing or rejecting mock does not change
+    `track()`'s return value or prevent the localStorage write. This is the only test
+    file in the repo that needs a DOM; it exists because `track()` itself requires
+    `window` via `hasWindow()`.
 - No new automated e2e journey; the existing Playwright suite already exercises
   `track()` extensively with the key unset (the only state it runs in), which is
   exactly User Story 1's acceptance criterion in practice.
@@ -148,3 +187,8 @@ already defined in the tracking plan. No second event taxonomy, no renamed prope
 - User identification, user properties, or Amplitude cohorts/dashboards configuration.
   This spec sends events; configuring what Amplitude does with them is Amplitude
   account administration, not application code.
+- Suppressing the Amplitude Browser SDK's own default data collection (e.g. an
+  auto-generated device id, IP-based geolocation) beyond disabling `autocapture`
+  events. These are the SDK's standard behavior on the key-present path, which no
+  real account or visitor ever exercises in this repo's shipped state (key unset in
+  production); acknowledged here so it is not later mistaken for an unaddressed gap.
