@@ -1,0 +1,62 @@
+'use client';
+
+import type { AnalyticsEvent, EventName } from '@/lib/types';
+import { isEventName } from '@/lib/analytics/events';
+
+const EVENTS_KEY = 'spread-studio:events';
+const SESSION_KEY = 'spread-studio:session-id';
+const EVENT_LIMIT = 2000;
+
+function hasWindow(): boolean {
+  return typeof window !== 'undefined';
+}
+
+function makeId(prefix: string): string {
+  if (hasWindow() && window.crypto?.randomUUID) return window.crypto.randomUUID();
+  return `${prefix}-${Math.random().toString(36).slice(2)}`;
+}
+
+export function getSessionId(): string {
+  if (!hasWindow()) return 'server-session';
+  const existing = window.sessionStorage.getItem(SESSION_KEY);
+  if (existing) return existing;
+  const id = makeId('session');
+  window.sessionStorage.setItem(SESSION_KEY, id);
+  return id;
+}
+
+export function readLiveEvents(): AnalyticsEvent[] {
+  if (!hasWindow()) return [];
+  const raw = window.localStorage.getItem(EVENTS_KEY);
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw) as AnalyticsEvent[];
+    return Array.isArray(parsed) ? parsed.filter((event) => isEventName(event.name)) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function writeLiveEvents(events: AnalyticsEvent[]): void {
+  if (!hasWindow()) return;
+  window.localStorage.setItem(EVENTS_KEY, JSON.stringify(events.slice(-EVENT_LIMIT)));
+}
+
+export function track(name: EventName, properties: AnalyticsEvent['properties'] = {}): AnalyticsEvent | null {
+  if (!hasWindow()) return null;
+  const event: AnalyticsEvent = {
+    id: makeId('event'),
+    name,
+    timestamp: new Date().toISOString(),
+    sessionId: getSessionId(),
+    source: 'live',
+    properties,
+  };
+  writeLiveEvents([...readLiveEvents(), event]);
+  return event;
+}
+
+export function clearLiveEvents(): void {
+  if (!hasWindow()) return;
+  window.localStorage.removeItem(EVENTS_KEY);
+}
