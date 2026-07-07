@@ -147,8 +147,10 @@ counts per event name.
 ## Success criteria *(mandatory)*
 
 - SC-1: Running the documented inspector command and calling all three tools returns
-  results that match the live /analytics page's numbers exactly, with no
-  discrepancy.
+  session counts (get_funnel's counts, get_template_popularity's counts,
+  get_event_counts) that match the live /analytics page's numbers exactly, with no
+  discrepancy. get_funnel's percentOfChainViewed field, which has no page
+  counterpart, is verified against its stated formula instead (see US1).
 - SC-2: A reader of the README can go from "this repo has an MCP server" to actually
   connecting an agent to it, using only the documented config snippet and commands.
 - SC-3: No new network-listening service, database, or hosted backend is introduced;
