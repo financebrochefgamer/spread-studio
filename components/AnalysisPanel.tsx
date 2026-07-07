@@ -83,7 +83,14 @@ export function AnalysisPanel({ underlyingSymbol, expiration, legs, templateId }
           Ticket
         </button>
       </div>
-      <OrderTicketModal open={ticketOpen} underlyingSymbol={underlyingSymbol} expiration={expiration} legs={legs} onClose={() => setTicketOpen(false)} />
+      <OrderTicketModal
+        open={ticketOpen}
+        underlyingSymbol={underlyingSymbol}
+        expiration={expiration}
+        legs={legs}
+        analysis={analysis}
+        onClose={() => setTicketOpen(false)}
+      />
     </section>
   );
 }
