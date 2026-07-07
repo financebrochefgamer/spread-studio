@@ -1,8 +1,17 @@
 # Role Gap Analysis: AI-Native Active Trader PM
 
 Date: 2026-07-07
-Status: Working guide for future specs
+Status: Superseded as the working spec queue; kept as the source document
 Audience: PM owner, Claude Code, Codex, and reviewers
+
+**Split note (2026-07-08):** this document mixed two different kinds of gaps under one
+label. Its "What To Add" content (things the repo can build) is now tracked as a
+structured, living queue in docs/product/spec-queue.md. Its "Learning Notes" content
+(domain and skill gaps a person has to actually learn or experience, not something
+more demo code substitutes for) moved to professional-development/, which is personal
+career development, not a product artifact. This document remains as the original
+analysis both were built from; read it for depth, read the other two for what is
+actually current.
 
 **Acceptance note (2026-07-07):** authored by an agent working the repo in parallel
 during v2 implementation. Reviewed for accuracy and accepted as the working spec

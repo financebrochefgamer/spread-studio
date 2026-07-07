@@ -67,8 +67,13 @@ Each item graduates by getting its own spec under specs/NNN-name/ before any cod
 
 ## Spec queue and role-alignment gap analysis
 
-docs/product/role-gap-analysis.md maps this repo against a target PM role in depth: a
-strengths scorecard, 15 named gaps with what to build for each, and a phased plan for
-closing them (finish in-flight work, then cheap high-signal process docs, then
-vendor-ready analytics, then broker-grade risk depth, then derivatives and platform
-breadth). Treat it as the working spec queue alongside this roadmap.
+docs/product/spec-queue.md is the living, structured spec queue: shipped work,
+in-progress work, and a ranked candidate backlog with role-signal evidence for each
+item. It supersedes the flat list this roadmap used to hold directly.
+
+docs/product/role-gap-analysis.md is the original, deeper gap analysis it was built
+from: a strengths scorecard and 15 named gaps against a target PM role. Its
+forward-looking "what to build" content became the spec queue's candidate backlog;
+its "learning notes" content (domain and skill gaps a person has to actually learn,
+not something the repo can build) moved to professional-development/, which is
+personal career development, not a product artifact.

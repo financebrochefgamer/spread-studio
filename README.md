@@ -41,7 +41,8 @@ It is a working demonstration of spec-driven product development with AI agents.
 | [docs/process/ai-workflow.md](docs/process/ai-workflow.md) | How the human and AI split worked |
 | [docs/process/agent-handoff-review.md](docs/process/agent-handoff-review.md) | Mid-build agent swap and the independent review that followed |
 | [docs/product/roadmap.md](docs/product/roadmap.md) | What was deferred and why |
-| [docs/product/role-gap-analysis.md](docs/product/role-gap-analysis.md) | Honest gap analysis against a target role and the resulting spec queue |
+| [docs/product/spec-queue.md](docs/product/spec-queue.md) | The living spec queue: shipped, in progress, and candidate work, ranked and evidenced |
+| [docs/product/role-gap-analysis.md](docs/product/role-gap-analysis.md) | The original gap analysis the spec queue and professional-development/ were split from |
 
 The commit history reads oldest-first as: design, Spec Kit setup, product docs, spec,
 plan, tasks, then implementation. Spec 002 repeats the full cycle, including a public
