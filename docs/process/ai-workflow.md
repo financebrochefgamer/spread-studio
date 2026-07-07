@@ -36,9 +36,15 @@ acceptance of each task.
 
 AI agents: implementation, tests, refactoring, documentation wiring, and verification.
 
-## Deviations
+## The mid-build agent handoff
 
-Claude hit a rate limit after the first repo-prep task. Codex continued from the written
-plan and documented handoff notes locally under .superpowers/sdd/codex-handoff.md. The
-public story should remain honest: this repo demonstrates an AI-agent workflow, with Codex
-standing in while Claude was unavailable.
+Partway through implementation the primary agent (Claude Code) became unavailable, and a
+second agent (Codex) continued from the same spec, plan, and task list, documenting every
+deviation in handoff notes. When Claude Code returned, it independently re-verified the
+work: re-ran the suites, audited the event taxonomy and UI test contract, and reviewed
+each flagged deviation before anything was published.
+
+That unplanned swap is the strongest evidence here for spec-driven development: the
+artifacts carried the intent, so the implementing agent was replaceable mid-project
+without losing direction. The full review record, including deviations accepted and why,
+is in docs/process/agent-handoff-review.md.

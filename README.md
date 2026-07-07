@@ -34,12 +34,13 @@ It is a working demonstration of spec-driven product development with AI agents.
 | [docs/product/success-metrics.md](docs/product/success-metrics.md) | Tracking plan written before the code |
 | [specs/001-options-strategy-builder](specs/001-options-strategy-builder) | spec.md, plan.md, tasks.md and design artifacts |
 | [docs/process/ai-workflow.md](docs/process/ai-workflow.md) | How the human and AI split worked |
+| [docs/process/agent-handoff-review.md](docs/process/agent-handoff-review.md) | Mid-build agent swap and the independent review that followed |
 | [docs/product/roadmap.md](docs/product/roadmap.md) | What was deferred and why |
 
 The commit history reads oldest-first as: design, Spec Kit setup, product docs, spec,
 plan, tasks, then implementation.
 
-## Screenshots
+## Simulated order flow
 
 ![Ticket](docs/images/ticket.png)
 
