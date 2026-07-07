@@ -37,6 +37,7 @@ It is a working demonstration of spec-driven product development with AI agents.
 | [docs/product/success-metrics.md](docs/product/success-metrics.md) | Tracking plan written before the code |
 | [specs/001-options-strategy-builder](specs/001-options-strategy-builder) | spec.md, plan.md, tasks.md and design artifacts |
 | [specs/002-positions-scenario-analysis](specs/002-positions-scenario-analysis) | Second spec cycle: spec PR reviewed to APPROVE across two rounds, then plan, tasks, implementation |
+| [docs/process/playbook.md](docs/process/playbook.md) | The living operating procedure this repo follows, with an append-only lessons log |
 | [docs/process/ai-workflow.md](docs/process/ai-workflow.md) | How the human and AI split worked |
 | [docs/process/agent-handoff-review.md](docs/process/agent-handoff-review.md) | Mid-build agent swap and the independent review that followed |
 | [docs/product/roadmap.md](docs/product/roadmap.md) | What was deferred and why |

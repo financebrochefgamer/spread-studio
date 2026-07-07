@@ -37,5 +37,13 @@ demonstrating spec-driven development with AI agents. Live: https://spread-studi
 
 ## Process
 
-Read docs/process/ai-workflow.md and docs/process/agent-handoff-review.md before large
-changes. Deferred scope belongs in docs/product/roadmap.md with a reason, not in code.
+Read docs/process/playbook.md before starting any new feature; it is the living
+operating procedure (spec PR review session, model tiering, working-tree discipline)
+and its Lessons section is append-only. Also read docs/process/ai-workflow.md and
+docs/process/agent-handoff-review.md for the origin story. Deferred scope belongs in
+docs/product/roadmap.md with a reason, not in code. docs/product/role-gap-analysis.md
+is the working spec queue for what to build next.
+
+When a review, incident, or handoff teaches a process lesson, append it to
+docs/process/playbook.md's Lessons section before moving on. This repo is meant to get
+smarter across sessions, not relearn the same lessons.
