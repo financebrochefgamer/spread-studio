@@ -33,14 +33,21 @@ the repo only claims analytics thinking; with it, the repo demonstrates the spec
 workflow (agent queries data, PM decides) the posting describes.
 
 **Acceptance**:
-- An MCP tool `get_funnel` returns the same five funnel stages, session counts, and
-  conversion percentages that /analytics renders, computed from the same
-  `aggregateFunnel` function the web app uses (lib/analytics/funnel.ts). No second
-  implementation of funnel math.
+- An MCP tool `get_funnel` returns the same five funnel stages and session counts that
+  /analytics renders, computed by calling the same `aggregateFunnel` function the web
+  app uses (lib/analytics/funnel.ts). No second implementation of funnel math. The
+  counts field is exactly `aggregateFunnel`'s return value, key for key.
+- The tool additionally returns a `percentOfChainViewed` figure per stage, a value the
+  live page does NOT render. Formula, stated exactly so there is one way to build it:
+  `round((stageCount / chainViewedCount) * 100, 1)`, using `chain_viewed`'s count as
+  the denominator; if `chain_viewed` is 0, every percentage is 0 (not NaN, not an
+  error).
 - The tool takes no required arguments in v1 (source data is fixed) and returns within
   one second locally.
 - Running the server and calling this tool through the official MCP inspector CLI
-  produces output matching the live /analytics page's funnel numbers exactly.
+  produces session counts matching the live /analytics page's funnel numbers exactly.
+  Percentages are not compared against the page, since the page has no percentage
+  field to compare against; they are verified against the stated formula instead.
 
 ### User Story 2 - Query template popularity through an agent (Priority: P2)
 
@@ -59,16 +66,28 @@ The PM asks how many times a specific tracked event fired. The agent returns exa
 counts per event name.
 
 **Acceptance**:
-- An MCP tool `get_event_counts` returns a count for every event name in the tracking
-  plan (docs/product/success-metrics.md), including zero for events that never fired,
-  computed from `countEventsByName` (lib/analytics/funnel.ts).
+- An MCP tool `get_event_counts` returns a count for every event name in `EVENT_NAMES`
+  (lib/analytics/events.ts, the executable list of 10 events; it agrees with
+  docs/product/success-metrics.md's dictionary and is the enumerable contract). The
+  handler layers a zero-fill over `countEventsByName`'s return value (which is
+  `Partial<Record<EventName, number>>`, only including event names that actually
+  fired), so every one of the 10 event names appears in the result, zero if absent.
 
 ### Edge cases
 
-- Server starts with zero events available: `get_funnel` and `get_event_counts` return
-  all-zero structures, not an error; `get_template_popularity` returns an empty list.
-- `limit` argument of zero or a non-integer: reject with a clear MCP tool error, do not
-  silently clamp or ignore.
+- Each tool handler accepts an injected events array (defaulting to `seededEvents()`
+  at server startup, not hardcoded inside the handler). This is not extra scope: it is
+  what makes "no duplicate math" honest (the handler is a thin wrapper around the
+  existing aggregation functions, which already take an events array) and it is what
+  makes the zero-events edge case actually testable, since v1's real data source never
+  produces zero events on its own.
+- Zero-events input: `get_funnel` and `get_event_counts` return all-zero structures
+  (percentages 0 per the get_funnel formula's explicit zero-denominator rule), not an
+  error; `get_template_popularity` returns an empty list.
+- `limit` argument of zero or a non-integer: reject as an MCP tool error result
+  (`isError: true` in the tool response), not an uncaught exception, so the rejection
+  is visible and mechanically checkable through the inspector CLI. Do not silently
+  clamp or ignore.
 - The server must never write to disk, open a network port, or make an outbound
   request. It is a read-only, local, stdio-transport process.
 
@@ -80,29 +99,43 @@ counts per event name.
   `get_template_popularity`, `get_event_counts`. No write tools, no tools that accept
   free-text queries (typed, deterministic tools only, consistent with the rest of this
   repo's engineering discipline).
-- FR-002: Data source in v1 is the deterministic seeded dataset
-  (lib/analytics/seed.ts), the same generator the live /analytics page merges with
-  live browser events. The server has no access to a browser's localStorage (a Node
-  process cannot read another process's browser storage); it is not in scope for v1 to
-  bridge that gap. This limitation is stated in the tool descriptions returned to the
-  connecting agent, not hidden.
+- FR-002: Data source in v1 is the deterministic seeded dataset, `seededEvents()`
+  exported from lib/analytics/seed.ts (120 sessions), the same generator the live
+  /analytics page merges with live browser events. The server has no access to a
+  browser's localStorage (a Node process cannot read another process's browser
+  storage); it is not in scope for v1 to bridge that gap. This limitation is stated in
+  the tool descriptions returned to the connecting agent, not hidden.
 - FR-003: No duplicate math. The MCP tool handlers call the existing
-  `aggregateFunnel`, `templatePopularity`, and `countEventsByName` functions directly;
-  they do not reimplement funnel or aggregation logic.
+  `aggregateFunnel`, `templatePopularity`, and `countEventsByName` functions directly
+  (all three from lib/analytics/funnel.ts); they do not reimplement funnel or
+  aggregation logic. `templatePopularity`'s return objects use the field name
+  `template` (not `templateId`); tool output preserves that field name.
 - FR-004: Transport is stdio (the standard for local Claude Desktop and Claude Code
   MCP configuration). No HTTP server, no listening port.
 - FR-005: The server is runnable as a standalone script independent of the Next.js
   dev/build process (`npm run mcp` or equivalent), because an agent's MCP client
-  launches it directly as a subprocess, not through the web app.
+  launches it directly as a subprocess, not through the web app. Named risk: every
+  file in the lib/analytics import chain (funnel.ts, seed.ts, events.ts, types.ts)
+  uses this repo's `@/` path alias, which Next's bundler and vitest.config.ts resolve
+  today but a plain `node` or `tsx` invocation does not resolve automatically. The
+  server must run with a mechanism that honors the existing tsconfig.json `paths`
+  mapping (tsx supports this natively when pointed at the repo's tsconfig.json) rather
+  than rewriting the existing `@/` imports in lib/analytics; plan.md confirms the
+  exact invocation and adds a smoke check that the server boots without a module
+  resolution error before any tool-level testing.
 
 ### Non-functional
 
 - Determinism: identical tool calls always return identical results (the seed
   generator is already deterministic; the server adds no randomness or clock reads).
-- Unit tests cover the three tool handlers against known seed-derived values (reuse
-  the same reference numbers already established in the funnel tests and the
-  experiment memo: 120 chain_viewed, 75 built, 49 analyzed, 27 placed under the
-  existing unordered/reach-count reading that lib/analytics/funnel.ts computes).
+- Unit tests cover the three tool handlers against known seed-derived values: 120
+  chain_viewed, 75 strategy_built, 49 strategy_analyzed, 27 order_placed, 0
+  position_closed, the reference numbers established in
+  docs/product/experiments/001-template-first-onboarding.md under the
+  unordered/reach-count reading that `aggregateFunnel` actually computes (this is not
+  yet asserted anywhere in tests/unit/analytics.test.ts, which only checks that
+  chain_viewed and page_view counts are greater than zero; this spec's tests are the
+  first to pin the exact values).
 - Manual verification: a documented, repeatable command using the official MCP
   inspector CLI (`npx @modelcontextprotocol/inspector`) that exercises all three
   tools, recorded as verification evidence in the implementation PR, since a full
@@ -118,10 +151,14 @@ counts per event name.
   discrepancy.
 - SC-2: A reader of the README can go from "this repo has an MCP server" to actually
   connecting an agent to it, using only the documented config snippet and commands.
-- SC-3: No new server, database, or network dependency is introduced; the constitution
-  holds (docs/process/playbook.md "no external APIs, no database, no auth" still
-  describes the product; the MCP server is an additional, separate, local-only
-  read tool over existing data, not a new backend for the app itself).
+- SC-3: No new network-listening service, database, or hosted backend is introduced;
+  the constitution holds ("no external APIs, no database, no auth" still describes the
+  product itself; the MCP server is an additional, separate, local-only, stdio-only
+  read tool over existing data). This spec does add two new package.json entries to
+  build the server: `@modelcontextprotocol/sdk` (runtime dependency, the tool
+  registration and stdio transport) and `tsx` (dev dependency, the script runner that
+  resolves the `@/` path alias per FR-005). Both are named here so the addition is
+  reviewed as part of this spec, not discovered later in a diff.
 
 ## Out of scope (with reasons)
 
