@@ -35,9 +35,11 @@ server.registerTool(
     title: 'Get template popularity',
     description:
       'Returns strategy template usage counts, sorted descending by count, computed by templatePopularity ' +
-      'over this repo\'s deterministic seeded dataset. Optional limit truncates to the top N entries. ' +
-      'Data source is a fixed local seed, not live browser sessions.',
-    inputSchema: { limit: z.number().int().positive().optional() },
+      'over this repo\'s deterministic seeded dataset. Optional limit (a positive integer) truncates to the ' +
+      'top N entries. Data source is a fixed local seed, not live browser sessions.',
+    // Deliberately not `.int().positive()` here: the positive-integer rule is enforced explicitly in the
+    // handler below (spec acceptance criterion: isError response, not zod's automatic schema rejection).
+    inputSchema: { limit: z.number().optional() },
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   },
   async ({ limit }) => {
