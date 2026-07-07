@@ -1,6 +1,6 @@
 # Spread Studio
 
-[![CI](https://github.com/OWNER/spread-studio/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/spread-studio/actions/workflows/ci.yml)
+[![CI](https://github.com/financebrochefgamer/spread-studio/actions/workflows/ci.yml/badge.svg)](https://github.com/financebrochefgamer/spread-studio/actions/workflows/ci.yml)
 
 A multi-leg options strategy builder, spec'd by a product manager and built by AI agents
 using GitHub Spec Kit, Claude Code, and Codex.
