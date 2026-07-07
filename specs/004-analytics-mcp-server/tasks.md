@@ -11,8 +11,8 @@ verification for the transport layer (per plan.md's stated scope decision).
 
 ## Phase 2: Server entry point
 
-- [ ] T203 Implement `mcp/server.ts` per plan.md: McpServer, three registerTool calls (get_funnel, get_template_popularity with explicit limit validation returning isError, get_event_counts), StdioServerTransport, no stdout writes outside the SDK
-- [ ] T204 Boot smoke check: run `npx tsx mcp/server.ts` from repo root, confirm it starts without a module resolution error and without crashing (Ctrl+C to stop); this is the FR-005 risk check plan.md named
+- [x] T203 Implement `mcp/server.ts` per plan.md: McpServer, three registerTool calls (get_funnel, get_template_popularity with explicit limit validation returning isError, get_event_counts), StdioServerTransport, no stdout writes outside the SDK
+- [x] T204 Boot smoke check: run `npx tsx mcp/server.ts` from repo root, confirm it starts without a module resolution error and without crashing (Ctrl+C to stop); this is the FR-005 risk check plan.md named
 
 ## Phase 3: Verification and docs
 
