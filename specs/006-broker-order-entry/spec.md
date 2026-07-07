@@ -37,22 +37,39 @@ Every real options ticket asks market-or-limit before anything else.
 **Acceptance**:
 - The ticket gains an order type control: Market (default, unchanged behavior) or
   Limit.
-- Limit orders set one net price for the whole strategy (a single number, matching
-  Order.netPremium's existing per-strategy shape), not a per-leg price. Per-leg limit
-  pricing is out of scope (see Out of scope).
-- Marketability, computed the same way for both debit and credit strategies: a limit
-  order is immediately fillable if the trader's limit is at least as good as the
-  strategy's current net mid (limit price <= net mid for a net debit the trader pays,
-  limit price >= net mid for a net credit the trader receives, using the strategy's
-  sign convention already established in lib/payoff/payoff.ts).
-- A marketable limit order fills exactly like a market order does today: same
-  position-creation code path, same event, same result. The only difference is the
-  fill price is the trader's limit, not the mid (this can differ from a market
-  order's result and that is correct: a marketable limit can fill better than mid).
+- Limit orders set one net price for the whole strategy, `netLimitPrice`, using the
+  exact same signed convention `strategyNetPremium` (lib/payoff/payoff.ts) already
+  uses for `Order.netPremium`: positive means a debit (the trader pays that much
+  net), negative means a credit (the trader receives that much net), zero means an
+  even-money strategy. Per-leg limit pricing is out of scope (see Out of scope).
+- Marketability rule, one inequality, no debit/credit case split, because both sides
+  already share one sign convention: **marketable iff `netMid <= netLimitPrice`**,
+  where `netMid` is the strategy's current `strategyNetPremium(legs)` value (the same
+  number a market order would use).
+  - Worked debit example: trader buys a bull call spread, `netMid = +1.50` (a $1.50
+    debit at market). Willing to pay up to $2.00: `netLimitPrice = +2.00`. Is
+    `1.50 <= 2.00`? Yes, marketable (over-bidding a cheaper market always fills).
+    Willing to pay only $1.00: `netLimitPrice = +1.00`. Is `1.50 <= 1.00`? No, not
+    marketable (market wants more than the trader will pay).
+  - Worked credit example: trader sells an iron condor, `netMid = -1.00` (a $1.00
+    credit at market; more negative means a larger credit). Willing to accept as
+    little as $0.80: `netLimitPrice = -0.80` (the least-negative, i.e. worst,
+    acceptable credit). Is `-1.00 <= -0.80`? Yes, marketable (the market's $1.00
+    credit is better than the $0.80 minimum, so it fills). Demanding at least $1.20
+    (`netLimitPrice = -1.20`): is `-1.00 <= -1.20`? No, not marketable (market isn't
+    offering enough credit).
+- A marketable order (market OR limit) always fills at `netMid`, never at the
+  trader's limit. This is a deliberate simplification, not price improvement: this
+  app has one deterministic reference price (mid), not a real order book with
+  separate best-bid/best-ask depth, so "fills at the best available price" collapses
+  to "fills at mid" here. A marketable limit therefore produces the exact same
+  `Order.netPremium` a market order would, which is what makes "fills exactly like a
+  market order does today" literally true, not just directionally similar. The
+  trader's limit only ever gates *whether* it fills, never *what price* it fills at.
 - A non-marketable limit order does NOT create a position. It creates a working order
-  record instead (Requirements below define its shape), visible in a new "Working
-  Orders" section on the Orders page, with quantity, legs, limit price, and a Cancel
-  action.
+  record instead (Requirements below define its shape and persistence key), visible
+  in a new "Working Orders" section on the Orders page, with quantity, legs, limit
+  price, and a Cancel action.
 - Canceling a working order removes it and creates no position. Idempotent: canceling
   an already-canceled or already-filled order is a no-op, not an error.
 
@@ -68,15 +85,20 @@ the posting names. A ticket with no friction before an unlimited-risk trade read
 consumer-grade regardless of how good the payoff chart looks.
 
 **Acceptance**:
-- Unlimited risk warning: shown when the strategy's `analyzePayoff` result has
+- Unlimited risk warning: shown when the strategy's `analyzeStrategy` result has
   `maxLoss === 'Unlimited'` or `maxProfit === 'Unlimited'` (the exact existing
   sentinel from lib/payoff/payoff.ts; no new math, no Infinity, no separate check).
 - Wide spread warning: shown per leg where `(ask - bid) / mid > 0.08` for that leg's
-  quote (an 8% threshold, chosen because it is verified against the actual chain
-  generator's spread formula in lib/chains/generate.ts to separate normal liquid
-  quotes, which run roughly 0.5-1% under the current spreadBps values, from thinly
-  quoted deep-OTM legs, which commonly exceed 10%; see plan.md for the verification
-  data). Names which leg(s) triggered it.
+  quote. The 8% threshold is verified against the actual chain generator's spread
+  formula (lib/chains/generate.ts, spread = max(0.02, mid * spreadBps/10000 + 0.01)).
+  The mechanism that drives a leg past 8% is low absolute price, not which
+  underlying it belongs to: the flat $0.01 addend and $0.02 floor dominate the ratio
+  once a quote's mid drops below roughly $0.25, regardless of that underlying's
+  spreadBps, so the warning naturally targets cheap, far-OTM legs (commonly 10-100%
+  once mid falls under a dime) while leaving normally-priced liquid legs (typically
+  under 1%, verified across every underlying's real spreadBps range) unflagged. See
+  plan.md for the exact computed values across sample quotes. Names which leg(s)
+  triggered it.
 - Complex order warning: shown when `legs.length > 4`.
 - All applicable warnings show together; none of them block the confirm button.
 - No warning fires when none of these conditions hold (the common case: a simple,
@@ -102,9 +124,11 @@ expiration to that would be a materially different, larger feature.
 
 ### Edge cases
 
-- Limit price of zero or negative: rejected at the input, same pattern as the
-  existing quantity validation elsewhere in the app (reject at the boundary, don't
-  compute against invalid input).
+- `netLimitPrice` is signed (debit positive, credit negative) per the marketability
+  rule above, so zero and negative values are both legitimate strategy prices (an
+  even-money strategy, or any credit strategy) and must NOT be rejected. The only
+  input to reject is a non-numeric or non-finite value, the same basic validation
+  already applied to other numeric inputs in the app.
 - A working order's underlying chain quote changes because the trader navigates away
   and reopens the builder with a different underlying: the working order retains its
   original leg quotes and limit price (it is a persisted record, not a live view); it
@@ -122,23 +146,43 @@ expiration to that would be a materially different, larger feature.
 ### Functional
 
 - FR-001: New type `WorkingOrder` (or equivalent) capturing: id, createdAt,
-  underlyingSymbol, expiration, legs, netLimitPrice, orderType ('market' | 'limit',
-  though a working order is always the limit case in practice since a market order
-  fills immediately), timeInForce ('day' | 'gtc'), status ('working' | 'canceled').
+  underlyingSymbol, expiration, legs, netLimitPrice, timeInForce ('day' | 'gtc'),
+  status ('working' | 'canceled'). No `orderType` field: a working order is always
+  the limit case (a market order that isn't marketable does not exist by
+  definition), so the field would be redundant here even though `Order` keeps it.
   Persisted the same way `Order` already is (existing localStorage pattern in
-  lib/persist, guarded try/catch per constitution).
-- FR-002: The existing `Order` type gains `timeInForce` and `orderType` fields so a
-  filled market or marketable-limit order also records what it was. No breaking
-  change to existing Order consumers: both new fields are additive.
+  lib/persist/orders.ts, guarded try/catch per constitution), under its own new key
+  `spread-studio:working-orders` (a distinct collection from `spread-studio:orders`,
+  same read-returns-empty-array-on-missing-or-corrupt-data behavior).
+- FR-002: The existing `Order` type gains OPTIONAL `timeInForce` and `orderType`
+  fields so a filled market or marketable-limit order also records what it was.
+  Optional, not required, specifically so this is non-breaking: existing `Order`
+  literals already constructed elsewhere in the codebase (for example in
+  tests/unit/positions.test.ts) continue to compile unchanged, and any `Order`
+  already persisted in localStorage from a session before this spec shipped reads
+  back with these fields simply absent, not malformed. The Orders page displays a
+  sensible default (e.g. "Market") when either field is missing on an older record.
 - FR-003: Marketability and fill-price logic lives in one pure function, unit tested,
   not duplicated between the ticket UI and any persistence code.
 - FR-004: Risk-warning logic (unlimited risk, wide spread, complex order) is computed
-  from data the ticket already has (the existing `analyzePayoff` result and chain
-  quotes); no new pricing or payoff math, no new API surface into lib/payoff.
-- FR-005: No new analytics events required by this spec's core acceptance criteria;
-  if the implementation finds a natural extension of the existing event taxonomy
-  useful (e.g. distinguishing a working order from a fill), it must be added to
-  docs/product/success-metrics.md in the same PR, not introduced silently.
+  entirely from `analyzeStrategy`'s existing return shape (lib/payoff/payoff.ts) and
+  the chain quotes already generated for the builder; no new pricing or payoff math,
+  no new API surface into lib/payoff. Note this is a real change to
+  components/OrderTicketModal.tsx's current behavior, not a no-op: the ticket does
+  not call `analyzeStrategy` today (it only calls `strategyNetPremium`), so the
+  implementation must add that call (or receive the result as a prop from wherever
+  the builder already computes it) to have the data these warnings need.
+- FR-005: Placing a non-marketable limit order is a meaningful user action
+  (constitution principle V) and must not be reported as `order_placed`, since that
+  would corrupt the existing fill funnel with actions that created no position
+  (breaking SC-1's "zero analytics inconsistency" requirement). Two new events, added
+  to docs/product/success-metrics.md in the same PR as this spec: `working_order_placed`
+  (properties: `underlying`, `legs`, `net_limit_price`), fired when a limit order is
+  not marketable and becomes a working order instead; `working_order_canceled`
+  (properties: `underlying`, `legs`), fired on a real cancel (not on the idempotent
+  no-op case of canceling an already-canceled or already-filled order).
+  `order_placed` continues to fire, unchanged, for every order that actually fills
+  (a market order, or a marketable limit).
 
 ### Non-functional
 
