@@ -9,9 +9,11 @@ export const EVENT_NAMES: EventName[] = [
   'order_ticket_opened',
   'order_placed',
   'strategy_saved',
+  'scenario_adjusted',
+  'position_closed',
 ];
 
-export const FUNNEL_STAGES = ['chain_viewed', 'strategy_built', 'strategy_analyzed', 'order_placed'] as const;
+export const FUNNEL_STAGES = ['chain_viewed', 'strategy_built', 'strategy_analyzed', 'order_placed', 'position_closed'] as const;
 
 export type FunnelStage = (typeof FUNNEL_STAGES)[number];
 
