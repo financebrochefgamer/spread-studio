@@ -66,6 +66,50 @@ Open `http://localhost:3000`.
 No API keys, no database, no auth, and no network calls are required by the app. Market
 data is generated from fixed inputs, so every run is identical.
 
+## MCP server
+
+A standalone, read-only, local MCP server exposes this repo's analytics data to an
+AI agent, so a PM can query product metrics through Claude Desktop or Claude Code
+instead of opening /analytics in a browser. It runs over stdio, does not open a
+network port, and shares no code path with the Next.js app other than reading from
+`lib/analytics`.
+
+Three tools, all sourced from the deterministic seeded dataset (`seededEvents()`,
+120 sessions), the same generator the live /analytics page merges with live browser
+events. The server has no access to a browser's localStorage, so it always reflects
+the seeded baseline, not a given browser session.
+
+- `get_funnel`: the five-stage activation funnel (chain_viewed, strategy_built,
+  strategy_analyzed, order_placed, position_closed) as session counts, plus a
+  `percentOfChainViewed` figure per stage.
+- `get_template_popularity`: strategy template usage counts, sorted descending, with
+  an optional `limit` (positive integer) to truncate the list.
+- `get_event_counts`: a count for every one of the 10 tracked event names, zero-filled
+  if an event never fired.
+
+Run it directly:
+
+```bash
+npm run mcp
+```
+
+Connect an agent to it by pointing a Claude Desktop or Claude Code MCP config at this
+repo. See [docs/mcp/claude-config-example.json](docs/mcp/claude-config-example.json)
+for a config snippet; replace the placeholder `cwd` with this clone's absolute path.
+
+Verify it manually with the official MCP inspector:
+
+```bash
+npx @modelcontextprotocol/inspector npx tsx mcp/server.ts
+```
+
+This opens a local web UI to call each tool interactively. For non-interactive
+verification, the inspector also has a `--cli` mode:
+
+```bash
+npx @modelcontextprotocol/inspector --cli npx tsx mcp/server.ts --method tools/call --tool-name get_funnel
+```
+
 ## Disclaimers
 
 All market data is simulated. Orders are simulated. Nothing here is investment advice or a

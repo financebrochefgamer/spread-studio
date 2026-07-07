@@ -17,8 +17,8 @@ verification for the transport layer (per plan.md's stated scope decision).
 ## Phase 3: Verification and docs
 
 - [x] T205 Manual verification with `npx @modelcontextprotocol/inspector npx tsx mcp/server.ts` per plan.md's exact checklist (counts match reference numbers, template field name, all 10 events present, limit 0 and limit 1.5 both return isError). Record the actual output in the implementation report.
-- [ ] T206 Create `docs/mcp/claude-config-example.json` per plan.md
-- [ ] T207 Add the "MCP server" section to `README.md`: what it exposes, the config snippet, the inspector verification command
+- [x] T206 Create `docs/mcp/claude-config-example.json` per plan.md
+- [x] T207 Add the "MCP server" section to `README.md`: what it exposes, the config snippet, the inspector verification command
 - [ ] T208 Full local suite green: `npm run test`, `npm run build` (confirm the new mcp/ directory and deps don't break the Next.js build), `npx playwright test`
 - [ ] T209 Open implementation PR; independent review; address findings
 - [ ] T210 Merge; no deploy step needed (the MCP server is not part of the Vercel-deployed app); update roadmap status
