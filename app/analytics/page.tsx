@@ -18,6 +18,8 @@ const LIVE_EVENTS: EventName[] = [
   'order_ticket_opened',
   'order_placed',
   'strategy_saved',
+  'scenario_adjusted',
+  'position_closed',
 ];
 
 export default function AnalyticsPage() {
