@@ -6,8 +6,8 @@ verification for the transport layer (per plan.md's stated scope decision).
 
 ## Phase 1: Dependencies and pure handlers (TDD)
 
-- [ ] T201 Add `@modelcontextprotocol/sdk`, `zod` (dependencies) and `tsx` (devDependency) to `package.json`; add `"mcp": "tsx mcp/server.ts"` script; `npm install`
-- [ ] T202 [TDD] Write failing tests 1-7 from plan.md in `tests/unit/mcp-handlers.test.ts`, then implement `mcp/handlers.ts` (getFunnelResult, getTemplatePopularityResult, getEventCountsResult) until green
+- [x] T201 Add `@modelcontextprotocol/sdk`, `zod` (dependencies) and `tsx` (devDependency) to `package.json`; add `"mcp": "tsx mcp/server.ts"` script; `npm install`
+- [x] T202 [TDD] Write failing tests 1-7 from plan.md in `tests/unit/mcp-handlers.test.ts`, then implement `mcp/handlers.ts` (getFunnelResult, getTemplatePopularityResult, getEventCountsResult) until green
 
 ## Phase 2: Server entry point
 
