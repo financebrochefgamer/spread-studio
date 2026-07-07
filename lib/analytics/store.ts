@@ -2,6 +2,7 @@
 
 import type { AnalyticsEvent, EventName } from '@/lib/types';
 import { isEventName } from '@/lib/analytics/events';
+import { sendToAmplitude } from '@/lib/analytics/amplitude';
 
 const EVENTS_KEY = 'spread-studio:events';
 const SESSION_KEY = 'spread-studio:session-id';
@@ -61,6 +62,7 @@ export function track(name: EventName, properties: AnalyticsEvent['properties'] 
     properties,
   };
   writeLiveEvents([...readLiveEvents(), event]);
+  void sendToAmplitude(name, properties).catch(() => {});
   return event;
 }
 

@@ -11,7 +11,7 @@ store.ts integration; both are unit tests, no e2e changes (per spec's stated sco
 
 ## Phase 2: store.ts integration (TDD)
 
-- [ ] T303 [TDD] Write failing tests 6-7 from plan.md in `tests/unit/store-amplitude.test.ts` (with `// @vitest-environment jsdom` at the top), then add the one-line `track()` integration in `lib/analytics/store.ts` until green
+- [x] T303 [TDD] Write failing tests 6-7 from plan.md in `tests/unit/store-amplitude.test.ts` (with `// @vitest-environment jsdom` at the top), then add the one-line `track()` integration in `lib/analytics/store.ts` until green
 
 ## Phase 3: Verification and docs
 
