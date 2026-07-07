@@ -62,6 +62,10 @@ export function track(name: EventName, properties: AnalyticsEvent['properties'] 
     properties,
   };
   writeLiveEvents([...readLiveEvents(), event]);
+  // This .catch() is the call-site half of the two-layer fire-and-forget guarantee
+  // (spec 005). jsdom does not surface a live unhandled-rejection signal for this
+  // specific call site, so no automated test can regress-guard it directly; do not
+  // remove it on the assumption it is redundant with amplitude.ts's own handling.
   void sendToAmplitude(name, properties).catch(() => {});
   return event;
 }

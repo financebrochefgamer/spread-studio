@@ -66,6 +66,14 @@ describe('sendToAmplitude', () => {
     await expect(sendToAmplitude('chain_viewed', {})).resolves.toBeUndefined();
   });
 
+  it('resolves without an unhandled rejection when init returns a rejecting promise', async () => {
+    process.env.NEXT_PUBLIC_AMPLITUDE_API_KEY = 'test-key';
+    initMock.mockReturnValue({ promise: Promise.reject(new Error('network')) });
+
+    await expect(sendToAmplitude('chain_viewed', {})).resolves.toBeUndefined();
+    expect(trackMock).toHaveBeenCalledWith('chain_viewed', {});
+  });
+
   it('resolves without throwing when track throws synchronously', async () => {
     process.env.NEXT_PUBLIC_AMPLITUDE_API_KEY = 'test-key';
     trackMock.mockImplementation(() => {
