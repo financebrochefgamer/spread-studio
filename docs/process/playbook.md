@@ -101,3 +101,18 @@ adjacent claim also being true.
   things: the spec review checks whether the stated formula is unambiguous and
   correct; the code review checks whether the code actually implements the stated
   formula. Both gates are necessary.
+- 2026-07-07: The sign/direction bug class recurred a third time, in a docs-only,
+  spec-only artifact with no implementation at all (specs/003's futures P&L formula
+  had no direction term, so it was silently correct for long and wrong for short).
+  This confirms the bug class is not implementation-specific; it is a class of error
+  in stating money-direction formulas at all, options or futures, spec or code. Any
+  future formula involving a signed position (long/short, buy/sell, debit/credit)
+  should get an explicit worked example with a concrete short/sell/credit case in the
+  spec itself, not just the long/buy/debit case, because that is the case error hides
+  in.
+- 2026-07-07: A reviewer that only spot-checks a claim against a document's own prose
+  can be fooled by prose that reads as complete but was authored by a probability
+  model of the code, not the code itself. Checking the experiment memo's funnel table
+  against lib/analytics/seed.ts and lib/analytics/funnel.ts directly, not just against
+  the memo's internal logic, caught that the seed generates independent (not ordered)
+  stage draws. When a doc cites what "the code does," verify it against the code.

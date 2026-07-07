@@ -33,10 +33,11 @@ real product. Reading the same data as a strictly ordered funnel (a session only
 counts at a stage if it also hit every earlier stage) gives 120 to 75 to 34 to 15, or
 45% built-to-analyzed and 44% analyzed-to-placed, both lower than the unordered table
 implies. Either read agrees on the headline finding below, which is why the seed's
-independence doesn't undermine this memo: production analytics_page.tsx funnel
-rendering already sums unique sessions per event name the same unordered way, so this
-table matches what the live /analytics page actually shows today; a future fix to make
-the seed emit strictly ordered events is tracked as a Minor item, not blocking here.
+independence doesn't undermine this memo: production's lib/analytics/funnel.ts
+aggregateFunnel already sums unique sessions per event name the same unordered way
+(app/analytics/page.tsx just renders that output), so this table matches what the live
+/analytics page actually shows today; a future fix to make the seed emit strictly
+ordered events is tracked as a Minor item, not blocking here.
 
 The largest single drop, in percentage points, is between viewing a chain and building
 a strategy (37.5 points under either reading). That is also the step with the least
