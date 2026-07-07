@@ -32,6 +32,8 @@ Target shape for a healthy funnel from seed baseline: 100% / 60% / 45% / 15%.
 | `order_ticket_opened` | ticket modal opened | `underlying`, `legs` |
 | `order_placed` | simulated order confirmed | `underlying`, `legs`, `net_premium` |
 | `strategy_saved` | strategy saved to list | `underlying`, `legs` |
+| `scenario_adjusted` | scenario control changed on /positions, debounced 500ms (spec 002) | `spot_shift_pct`, `vol_shift_pts`, `days_forward` |
+| `position_closed` | open position closed at base scenario (spec 002) | `underlying`, `legs`, `realized_pl` |
 
 ## Implementation notes
 

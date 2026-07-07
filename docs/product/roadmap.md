@@ -15,8 +15,10 @@ demo with CI green.
   well.
 - Real Amplitude destination for the existing event taxonomy. Deferred because the
   tracking plan and funnel math are the PM deliverable; vendor wiring is plumbing.
-- Positions and P/L over time using mark-to-model. Deferred because it requires a
-  persistence and pricing-refresh model that would double v1 scope.
+- Positions and P/L over time using mark-to-model. Deferred from v1 because it would
+  have doubled scope. Promoted: now in flight as
+  specs/002-positions-scenario-analysis, reshaped as scenario-based mark-to-model
+  (spot, vol, and time shifts) to stay inside the deterministic-demo constitution.
 
 ## v3: Breadth
 
