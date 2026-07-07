@@ -112,7 +112,7 @@ export function valuePosition(order: Order, scenario: Scenario): PositionValuati
     }
 
     const priced = priceLeg(leg, entryQuote.iv, underlying, scenario);
-    const signedMark = direction * priced.price;
+    const signedMark = markLeg(leg, entryQuote.iv, underlying, scenario);
     modelValue += signedMark * CONTRACT_MULTIPLIER * leg.quantity;
     greeks = addScaledGreeks(
       greeks,

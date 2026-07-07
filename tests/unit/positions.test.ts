@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { ClosedPosition, Leg, Order } from '@/lib/types';
+import type { ClosedPosition, Leg, Order, OptionQuote } from '@/lib/types';
 import { generateChain } from '@/lib/chains/generate';
 import { EXPIRATIONS, getExpiration, getUnderlying } from '@/lib/market/constants';
 import { priceOption } from '@/lib/pricing/blackScholes';
@@ -175,6 +175,46 @@ describe('lib/positions/valuation', () => {
     expect(openOrders).toEqual([orderB]);
 
     delete (globalThis as unknown as { window?: unknown }).window;
+  });
+
+  it('test 9: missing entry chain quote falls back to leg.quote.mid and flags the valuation', () => {
+    const expirationDate = EXPIRATIONS[0].date;
+    // 183 is not on AURA's generated strike ladder (multiples of 10 around the
+    // 180 ATM strike), so findEntryQuote cannot find a matching chain quote.
+    const missingQuote: OptionQuote = {
+      underlyingSymbol: 'AURA',
+      expiration: expirationDate,
+      strike: 183,
+      type: 'call',
+      bid: 4.9,
+      ask: 5.1,
+      mid: 5.0,
+      iv: 0.3,
+      greeks: { delta: 0.5, gamma: 0.02, theta: -0.05, vega: 0.1 },
+    };
+    const leg: Leg = {
+      id: 'missing-quote-leg',
+      instrument: 'call',
+      side: 'buy',
+      quantity: 1,
+      strike: missingQuote.strike,
+      expiration: expirationDate,
+      quote: missingQuote,
+    };
+    const order: Order = {
+      id: 'missing-quote-order',
+      createdAt: '2026-07-06T14:00:00.000Z',
+      underlyingSymbol: 'AURA',
+      expiration: expirationDate,
+      legs: [leg],
+      netPremium: 0,
+    };
+
+    const valuation = valuePosition(order, BASE_SCENARIO);
+
+    expect(valuation.flagged).toBe(true);
+    expect(valuation.modelValue).toBeCloseTo(missingQuote.mid * 100 * leg.quantity, 6);
+    expect(valuation.greeks.delta).toBeCloseTo(missingQuote.greeks.delta * 100, 6);
   });
 
   it('test 8: maxDaysForward is 0 for no orders and the min DTE across mixed expirations', () => {
