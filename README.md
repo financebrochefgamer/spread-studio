@@ -66,6 +66,14 @@ Open `http://localhost:3000`.
 No API keys, no database, no auth, and no network calls are required by the app. Market
 data is generated from fixed inputs, so every run is identical.
 
+## Amplitude (optional)
+
+Setting the build-time env var `NEXT_PUBLIC_AMPLITUDE_API_KEY` sends every event from
+the existing tracking plan to Amplitude as well as localStorage, using the same event
+names and properties, no second taxonomy. It is unset by default, including on the
+public demo, so the deployed app never makes a network call to Amplitude; this is a
+build-time flag, so setting it requires a rebuild and redeploy, not a runtime toggle.
+
 ## MCP server
 
 A standalone, read-only, local MCP server exposes this repo's analytics data to an

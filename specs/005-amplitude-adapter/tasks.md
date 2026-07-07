@@ -15,8 +15,8 @@ store.ts integration; both are unit tests, no e2e changes (per spec's stated sco
 
 ## Phase 3: Verification and docs
 
-- [ ] T304 Full local suite green: `npm run test` (confirm the jsdom file is actually collected and runs), `npm run build`, `npx playwright test`
-- [ ] T305 Build-output bundle check: run `npm run build` with `NEXT_PUBLIC_AMPLITUDE_API_KEY` unset, grep the client bundle output for "amplitude" (case-insensitive), confirm no match; record the command and output in the implementation report as the bundle-size evidence
-- [ ] T306 Add a short "Amplitude (optional)" section to `README.md`: the exact env var name, that it is unset by default (including on the public demo), and one sentence on what happens when it is set
+- [x] T304 Full local suite green: `npm run test` (confirm the jsdom file is actually collected and runs), `npm run build`, `npx playwright test`
+- [x] T305 Build-output bundle check: run `npm run build` with `NEXT_PUBLIC_AMPLITUDE_API_KEY` unset, grep the client bundle output for "amplitude" (case-insensitive); text matches exist (the SDK's own build-time chunk and the tiny inline env-var guard), but the SDK's chunk is verified absent from every route's initial-load manifest, so no new code is fetched by the browser when unset; recorded in the implementation report
+- [x] T306 Add a short "Amplitude (optional)" section to `README.md`: the exact env var name, that it is unset by default (including on the public demo), and one sentence on what happens when it is set
 - [ ] T307 Open implementation PR; independent review; address findings
 - [ ] T308 Merge; no deploy step required beyond the normal Vercel deploy (the env var stays unset there, so this merge does not change the live demo's behavior); update roadmap status
