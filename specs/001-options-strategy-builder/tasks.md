@@ -20,29 +20,29 @@ traceability.
 
 **Purpose**: Initialize the Next.js app, test tooling, and base app shell.
 
-- [ ] T001 Create Next.js project files in `package.json`, `tsconfig.json`, `next.config.ts`, `postcss.config.mjs`, and `eslint.config.mjs`
-- [ ] T002 [P] Configure Tailwind and broker-grade global styles in `app/globals.css`
-- [ ] T003 [P] Configure Vitest in `vitest.config.ts`
-- [ ] T004 [P] Configure Playwright in `playwright.config.ts`
-- [ ] T005 Create base app routes in `app/layout.tsx`, `app/page.tsx`, `app/orders/page.tsx`, and `app/analytics/page.tsx`
+- [x] T001 Create Next.js project files in `package.json`, `tsconfig.json`, `next.config.ts`, `postcss.config.mjs`, and `eslint.config.mjs`
+- [x] T002 [P] Configure Tailwind and broker-grade global styles in `app/globals.css`
+- [x] T003 [P] Configure Vitest in `vitest.config.ts`
+- [x] T004 [P] Configure Playwright in `playwright.config.ts`
+- [x] T005 Create base app routes in `app/layout.tsx`, `app/page.tsx`, `app/orders/page.tsx`, and `app/analytics/page.tsx`
 
 ## Phase 2: Foundational Domain And State
 
 **Purpose**: Core types, deterministic market data, pricing, payoff, analytics, persistence,
 and state. User story work must wait until this phase is complete.
 
-- [ ] T006 Define shared domain types in `lib/types.ts`
-- [ ] T007 [P] Define market constants, fixed expirations, and 8 underlyings in `lib/market/constants.ts`
-- [ ] T008 [P] Write Black-Scholes reference tests in `tests/unit/pricing.test.ts`
-- [ ] T009 Implement Black-Scholes price and Greeks in `lib/pricing/blackScholes.ts`
-- [ ] T010 [P] Write deterministic chain generation tests in `tests/unit/chains.test.ts`
-- [ ] T011 Implement deterministic option chain generation in `lib/chains/generate.ts`
-- [ ] T012 [P] Write payoff, breakeven, and max P/L tests in `tests/unit/payoff.test.ts`
-- [ ] T013 Implement payoff analysis and unlimited detection in `lib/payoff/payoff.ts`
-- [ ] T014 [P] Write analytics aggregation and storage tests in `tests/unit/analytics.test.ts`
-- [ ] T015 Implement analytics event definitions, seed data, funnel aggregation, and browser storage in `lib/analytics/events.ts`, `lib/analytics/seed.ts`, `lib/analytics/funnel.ts`, and `lib/analytics/store.ts`
-- [ ] T016 [P] Implement local order and strategy persistence in `lib/persist/orders.ts` and `lib/persist/strategies.ts`
-- [ ] T017 Implement builder state and actions in `lib/state/builder.ts`
+- [x] T006 Define shared domain types in `lib/types.ts`
+- [x] T007 [P] Define market constants, fixed expirations, and 8 underlyings in `lib/market/constants.ts`
+- [x] T008 [P] Write Black-Scholes reference tests in `tests/unit/pricing.test.ts`
+- [x] T009 Implement Black-Scholes price and Greeks in `lib/pricing/blackScholes.ts`
+- [x] T010 [P] Write deterministic chain generation tests in `tests/unit/chains.test.ts`
+- [x] T011 Implement deterministic option chain generation in `lib/chains/generate.ts`
+- [x] T012 [P] Write payoff, breakeven, and max P/L tests in `tests/unit/payoff.test.ts`
+- [x] T013 Implement payoff analysis and unlimited detection in `lib/payoff/payoff.ts`
+- [x] T014 [P] Write analytics aggregation and storage tests in `tests/unit/analytics.test.ts`
+- [x] T015 Implement analytics event definitions, seed data, funnel aggregation, and browser storage in `lib/analytics/events.ts`, `lib/analytics/seed.ts`, `lib/analytics/funnel.ts`, and `lib/analytics/store.ts`
+- [x] T016 [P] Implement local order and strategy persistence in `lib/persist/orders.ts` and `lib/persist/strategies.ts`
+- [x] T017 Implement builder state and actions in `lib/state/builder.ts`
 
 **Checkpoint**: Domain logic, persistence helpers, analytics helpers, and builder state are testable without UI.
 
