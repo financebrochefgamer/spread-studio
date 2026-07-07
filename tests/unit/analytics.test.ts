@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { AnalyticsEvent } from '@/lib/types';
 import { aggregateFunnel, countEventsByName, templatePopularity } from '@/lib/analytics/funnel';
+import { FUNNEL_STAGES } from '@/lib/analytics/events';
 import { seededEvents } from '@/lib/analytics/seed';
 
 function event(sessionId: string, name: AnalyticsEvent['name'], properties: AnalyticsEvent['properties'] = {}): AnalyticsEvent {
@@ -15,6 +16,11 @@ function event(sessionId: string, name: AnalyticsEvent['name'], properties: Anal
 }
 
 describe('analytics aggregation', () => {
+  it('defines 5 funnel stages with position_closed last', () => {
+    expect(FUNNEL_STAGES).toHaveLength(5);
+    expect(FUNNEL_STAGES[FUNNEL_STAGES.length - 1]).toBe('position_closed');
+  });
+
   it('counts funnel stages per session', () => {
     const events = [
       event('s1', 'chain_viewed'),
@@ -30,6 +36,7 @@ describe('analytics aggregation', () => {
       strategy_built: 2,
       strategy_analyzed: 1,
       order_placed: 1,
+      position_closed: 0,
     });
   });
 

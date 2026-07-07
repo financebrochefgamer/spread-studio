@@ -16,6 +16,7 @@ export function aggregateFunnel(events: AnalyticsEvent[]): FunnelCounts {
     strategy_built: 0,
     strategy_analyzed: 0,
     order_placed: 0,
+    position_closed: 0,
   };
 
   for (const set of sessions.values()) {
@@ -23,6 +24,7 @@ export function aggregateFunnel(events: AnalyticsEvent[]): FunnelCounts {
     if (set.has('template_selected') || set.has('leg_edited')) counts.strategy_built += 1;
     if (set.has('strategy_analyzed')) counts.strategy_analyzed += 1;
     if (set.has('order_placed')) counts.order_placed += 1;
+    if (set.has('position_closed')) counts.position_closed += 1;
   }
 
   return counts;
