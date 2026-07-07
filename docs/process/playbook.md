@@ -116,3 +116,17 @@ adjacent claim also being true.
   against lib/analytics/seed.ts and lib/analytics/funnel.ts directly, not just against
   the memo's internal logic, caught that the seed generates independent (not ordered)
   stage draws. When a doc cites what "the code does," verify it against the code.
+- 2026-07-07: Before a plan cites a third-party library's API (function names, import
+  paths, argument shapes), verify it against that library's actual current
+  documentation, not training-data recall. The plan for the analytics MCP server
+  fetched the official SDK's own example code before writing the module layout,
+  which meant the implementer built against a verified API on the first pass instead
+  of discovering a wrong import path mid-implementation.
+- 2026-07-07: A plan's own example code can still be wrong even when the plan is
+  otherwise careful. The MCP server plan specified a zod schema
+  (`z.number().int().positive().optional()`) that would have made an explicitly
+  required handler-level validation check unreachable dead code, because zod would
+  reject the bad input before the handler ever ran. The implementer caught this by
+  actually running the server and observing real tool output, not by reading the
+  plan and trusting it. Prefer running the thing over reading the plan about the
+  thing whenever the two are both available cheaply.
