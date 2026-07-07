@@ -45,9 +45,15 @@ CL-style energy future do not share a tick value).
 
 **Acceptance**:
 - Each synthetic contract publishes symbol, description, tick size, tick value,
-  contract multiplier (point value), and a synthetic last price.
+  contract multiplier (point value), and a synthetic last price, and that last price is
+  an exact whole number of ticks from zero (so tick-based rounding is always
+  unambiguous; see User Story 2).
+- The trader selects a contract, a side (long or short), and a quantity. Quantity is a
+  positive integer; side is a separate explicit field, not encoded as a signed
+  quantity.
 - Selecting a contract and a quantity shows: dollar value per tick, dollar value per
-  point, and current notional exposure (last price x multiplier x quantity).
+  point, and current notional exposure (last price x multiplier x quantity). Notional
+  exposure is unsigned (a size, not a P&L) and does not depend on side.
 - Switching contracts recalculates immediately; no formula is shared across contracts
   that have different tick/point values.
 
@@ -58,11 +64,18 @@ dollars, using that contract's own tick value, not a percentage-of-notional
 approximation.
 
 **Acceptance**:
-- Scenario input accepts either a tick count or a percent move; both resolve to the
-  same underlying price shift and produce the same dollar P&L for a given shift size
-  (the two input modes are equivalent, not independent calculations).
-- P&L = (shiftedPrice - lastPrice) / tickSize x tickValue x quantity, sign-aware for
-  long and short.
+- Scenario input accepts either a tick count or a percent move. Percent mode converts
+  to a raw price delta (lastPrice x percent), then rounds that delta to the nearest
+  whole number of ticks, rounding half away from zero. The rounded tick count is then
+  the single source of truth: both input modes compute P&L from a tick count, so they
+  cannot silently disagree once the percent has been converted.
+- directionSign = 1 if side is long, -1 if side is short.
+- ticksMoved = (tick-mode: the entered tick count as signed, positive for a price
+  increase, negative for a decrease) or (percent-mode: round(lastPrice x percent /
+  tickSize), rounded half away from zero).
+- P&L = directionSign x ticksMoved x tickValue x quantity. A long position gains when
+  ticksMoved is positive (price rose); a short position gains when ticksMoved is
+  negative (price fell).
 - Deterministic: synthetic last price is a fixed constant per contract, not derived
   from any external feed.
 

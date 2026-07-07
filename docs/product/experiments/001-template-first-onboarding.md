@@ -18,18 +18,31 @@ is stated once here and should be assumed throughout, not re-argued per section.
 Computing the funnel from the current seed dataset (mulberry32 seed 20260706, 120
 sessions):
 
-| Stage | Sessions | % of prior stage | % of chain_viewed |
-| --- | --- | --- | --- |
-| chain_viewed | 120 | - | 100% |
-| strategy built (template_selected or leg_edited) | 75 | 62.5% | 62.5% |
-| strategy_analyzed | 49 | 65.3% | 40.8% |
-| order_placed | 27 | 55.1% | 22.5% |
+| Stage | Sessions reaching this stage | % of chain_viewed |
+| --- | --- | --- |
+| chain_viewed | 120 | 100% |
+| strategy built (template_selected or leg_edited) | 75 | 62.5% |
+| strategy_analyzed | 49 | 40.8% |
+| order_placed | 27 | 22.5% |
+
+Caveat on this table: lib/analytics/seed.ts fires each stage as an independent
+probability draw (0.62, 0.48, 0.18), not gated on the prior stage. So these are stage
+*reach* counts, not a strictly ordered funnel: 15 seeded sessions "analyze" without
+ever "building," and 12 "place an order" without analyzing, which cannot happen in the
+real product. Reading the same data as a strictly ordered funnel (a session only
+counts at a stage if it also hit every earlier stage) gives 120 to 75 to 34 to 15, or
+45% built-to-analyzed and 44% analyzed-to-placed, both lower than the unordered table
+implies. Either read agrees on the headline finding below, which is why the seed's
+independence doesn't undermine this memo: production analytics_page.tsx funnel
+rendering already sums unique sessions per event name the same unordered way, so this
+table matches what the live /analytics page actually shows today; a future fix to make
+the seed emit strictly ordered events is tracked as a Minor item, not blocking here.
 
 The largest single drop, in percentage points, is between viewing a chain and building
-a strategy (37.5 points). That is also the step with the least product support today:
-a trader who opens a chain is shown 21 strikes and 9 template buttons with no
-recommendation, so the jump from "I see data" to "I did something with it" depends
-entirely on the trader already knowing what they want to build.
+a strategy (37.5 points under either reading). That is also the step with the least
+product support today: a trader who opens a chain is shown 21 strikes and 9 template
+buttons with no recommendation, so the jump from "I see data" to "I did something with
+it" depends entirely on the trader already knowing what they want to build.
 
 ## Hypothesis
 
@@ -42,11 +55,18 @@ start, not the templates themselves.
 ## Design (as it would run on a real platform)
 
 - **Unit of randomization:** session (sessionId already exists in the event schema).
+  Caveat: session is not user; a returning visitor can land in both arms across
+  visits, which dilutes measured effect size versus true user-level randomization. A
+  real rollout would move to a stable anonymous user id if one existed.
 - **Control:** current builder page, no template pre-selected.
 - **Variant:** builder page opens with a recommended template applied and a visible
   "Recommended for AURA's volatility" label the trader can dismiss or swap.
 - **Primary metric:** session reaches `strategy built` (proportion of `chain_viewed`
   sessions with a `template_selected` or `leg_edited` event). Current baseline 62.5%.
+  Note: today's seed dataset never fires `leg_edited`, so the current baseline is
+  effectively `template_selected` alone; the OR clause exists because the real product
+  lets a trader start from either a template or a bare leg, and both are equally valid
+  ways to reach this stage once live.
 - **Guardrail metrics:**
   - `strategy_analyzed` rate should not drop (a pre-filled template that traders
     ignore or immediately abandon would inflate the primary metric without adding
@@ -57,8 +77,8 @@ start, not the templates themselves.
     recommended template; if it does, the variant is anchoring choice rather than
     reducing friction.
 - **Minimum detectable effect:** targeting a 10-point lift (62.5% to 72.5%) at 80%
-  power and a 5% significance level needs roughly 300 sessions per arm using a
-  two-proportion test. At the seed dataset's current volume this is a multi-week
+  power and a 5% two-sided significance level needs approximately 345 sessions per arm
+  using a two-proportion z-test. At the seed dataset's current volume this is a multi-week
   collection window on a real platform, which is itself a useful planning number.
 
 ## Decision (worked example)
