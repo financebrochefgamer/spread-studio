@@ -70,7 +70,7 @@ call is always `result.promise.catch(() => {})`.
   ```
   Note: `sendToAmplitude` is itself `async` and its own returned promise must be
   caught at the call site (see `store.ts` below) for the same reason `.promise` needs
-  `.catch()` — an `async` function that throws produces a rejected promise. The
+  `.catch()` -- an `async` function that throws produces a rejected promise. The
   internal `try/catch` here already prevents most synchronous failures inside the
   function body from becoming a rejection, but the call site still guards defensively
   per the spec's "every promise it produces or receives" requirement.
