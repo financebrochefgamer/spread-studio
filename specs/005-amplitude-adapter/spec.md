@@ -81,8 +81,9 @@ already defined in the tracking plan. No second event taxonomy, no renamed prope
 - Key present but invalid or Amplitude's servers unreachable: no visible effect on the
   app; this is exactly what "best-effort, never throws" exists to guarantee. Not
   something this spec's tests simulate against a real network (see Non-functional);
-  it is guaranteed structurally by never awaiting or letting the call affect
-  `track()`'s control flow.
+  it is guaranteed by the try/catch and no-op `.catch()` mechanism specified in User
+  Story 2, not merely by omitting `await` (which alone would not prevent an unhandled
+  promise rejection; see User Story 2 for why).
 - Key present in a server-side render context (no `window`): `track()` already returns
   `null` and no-ops when `!hasWindow()` (lib/analytics/store.ts:54); this spec does
   not change that guard, so Amplitude is never touched server-side either.
@@ -148,12 +149,15 @@ already defined in the tracking plan. No second event taxonomy, no renamed prope
     mocked `track` that throws synchronously does not propagate; a mocked `track`
     that returns a rejecting promise produces no unhandled rejection (Vitest would
     otherwise surface this as a failure) and does not propagate either.
-  - One integration test file using a `// @vitest-environment jsdom` directive (this
-    spec adds `jsdom` as a new devDependency) verifies `track()` in
-    `lib/analytics/store.ts` actually calls into the new module (mocked) after its
-    localStorage write, and that a throwing or rejecting mock does not change
-    `track()`'s return value or prevent the localStorage write. This is the only test
-    file in the repo that needs a DOM; it exists because `track()` itself requires
+  - One integration test file, `tests/unit/store-amplitude.test.ts` (this exact path
+    matters: vitest.config.ts's `include` is scoped to `tests/unit/**/*.test.ts`, so
+    the file must live there to be collected at all), using a
+    `// @vitest-environment jsdom` directive (this spec adds `jsdom` as a new
+    devDependency) verifies `track()` in `lib/analytics/store.ts` actually calls into
+    the new module (mocked) after its localStorage write, and that a throwing or
+    rejecting mock does not change `track()`'s return value or prevent the
+    localStorage write. This is the only test file in the repo that needs a DOM; it
+    exists because `track()` itself requires
     `window` via `hasWindow()`.
 - No new automated e2e journey; the existing Playwright suite already exercises
   `track()` extensively with the key unset (the only state it runs in), which is
