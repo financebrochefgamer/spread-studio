@@ -23,7 +23,9 @@ export type EventName =
   | 'order_placed'
   | 'strategy_saved'
   | 'scenario_adjusted'
-  | 'position_closed';
+  | 'position_closed'
+  | 'working_order_placed'
+  | 'working_order_canceled';
 
 export interface Greeks {
   delta: number;
@@ -111,6 +113,19 @@ export interface Order {
   expiration: string;
   legs: Leg[];
   netPremium: number;
+  timeInForce?: 'day' | 'gtc';
+  orderType?: 'market' | 'limit';
+}
+
+export interface WorkingOrder {
+  id: string;
+  createdAt: string;
+  underlyingSymbol: string;
+  expiration: string;
+  legs: Leg[];
+  netLimitPrice: number;
+  timeInForce: 'day' | 'gtc';
+  status: 'working' | 'canceled';
 }
 
 export interface ClosedPosition {
