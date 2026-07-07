@@ -130,3 +130,24 @@ adjacent claim also being true.
   actually running the server and observing real tool output, not by reading the
   plan and trusting it. Prefer running the thing over reading the plan about the
   thing whenever the two are both available cheaply.
+- 2026-07-07: "Not awaiting a promise" and "never producing an unhandled rejection"
+  are not the same guarantee, and a spec that treats them as the same will pass
+  review right up until a reviewer traces the actual mechanism. Fire-and-forget
+  requires an explicit no-op `.catch()` on every promise a call produces or
+  receives; omitting `await` only prevents blocking, not the rejection itself from
+  surfacing. This exact mis-specification survived one full review round in the
+  Amplitude adapter spec before being caught, and then survived into a second round
+  as a leftover sentence in a different section that the first fix never touched.
+  When a spec states a mechanism, grep the whole document for the old, disproved
+  phrasing before re-submitting; a fix in one place does not fix every echo of the
+  same wrong idea.
+- 2026-07-07: A spec's literal verification instruction ("grep the build output for
+  X, expect no match") can be a well-intentioned shortcut that turns out to be
+  unachievable for reasons the spec author didn't anticipate (a dynamically
+  imported dependency's build-time chunk exists on disk regardless of whether it is
+  ever fetched at runtime). When an implementer's honest report says "the literal
+  instruction doesn't produce a clean result, so I verified the underlying claim a
+  different way instead," that is not corner-cutting; check whether the substitute
+  verification actually proves what the spec's acceptance criterion cared about,
+  and treat a well-reasoned substitution as a legitimate part of implementation,
+  not a deviation to be punished.

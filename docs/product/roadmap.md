@@ -13,8 +13,18 @@ demo with CI green.
 - Live delayed market data behind a provider adapter. Deferred from v1 because API keys
   and rate limits make demos fragile, and synthetic data proves the product logic just as
   well.
-- Real Amplitude destination for the existing event taxonomy. Deferred because the
-  tracking plan and funnel math are the PM deliverable; vendor wiring is plumbing.
+- Real Amplitude destination for the existing event taxonomy. Deferred from v1
+  because the tracking plan and funnel math were the PM deliverable and vendor
+  wiring was plumbing. Shipped 2026-07-07 as specs/005-amplitude-adapter: an
+  optional, off-by-default destination that forwards every tracked event to
+  Amplitude, fire-and-forget, when NEXT_PUBLIC_AMPLITUDE_API_KEY is set. The public
+  demo does not set this var and stays byte-for-byte unchanged (confirmed by an
+  unchanged initial bundle size). Ran the full cycle: spec PR reviewed across three
+  rounds (real catches include a fire-and-forget mechanism that was initially wrong,
+  a build-time-env-var claim that needed correcting against next.config.ts, and a
+  self-contradiction introduced while fixing the first issue), implementation
+  reviewed and merged. Proven correct with fully mocked unit tests; no live
+  Amplitude account exists or is needed for this repo.
 - Positions and P/L over time using mark-to-model. Deferred from v1 because it would
   have doubled scope. Shipped 2026-07-07 as specs/002-positions-scenario-analysis,
   reshaped as scenario-based mark-to-model (spot, vol, and time shifts) to stay inside
