@@ -25,7 +25,11 @@ demo with CI green.
 ## v3: Breadth
 
 - Futures chains and futures options. Margin and tick conventions differ enough to be
-  their own spec.
+  their own spec. specs/003-futures-risk-preview specs a synthetic tick/point risk
+  preview, deliberately spec-only: a demonstration that a spec is a complete PM
+  deliverable on its own, and a scope call that options depth mattered more than
+  futures breadth for this repo's first two build cycles. Promote to a plan and
+  implementation if that call changes.
 - Calendars and diagonals. These require multi-expiration payoff modeling, because the
   far leg must be valued at near expiration with a pricing model, not just intrinsic
   value.
