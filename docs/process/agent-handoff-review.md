@@ -59,6 +59,28 @@ code change was needed.
    Accepted: the data remains deterministic and internally consistent, and all tests
    pass against it.
 
+## The final whole-branch review and what it caught
+
+After all tasks completed, an independent reviewer agent (a different model from the
+implementers) reviewed the entire branch against the design spec before final deploy.
+It found no critical issues and three important ones, all fixed and re-reviewed before
+the production redeploy:
+
+1. Aggregate position Greeks omitted the 100x contract multiplier on option legs, so a
+   covered call showed net delta near 99.6 when the share-equivalent answer is near 55.
+   The fix multiplies option leg Greeks by the same contract multiplier the P/L math
+   already uses, locked in by a covered-call unit test.
+2. The order ticket's confirm button gave no feedback and could submit duplicates. It
+   now disables itself and shows a placed state.
+3. localStorage reads and writes were not exception guarded, which could break clicks
+   in browsers with blocked storage. All storage access is now wrapped.
+
+The Greeks finding is the reason this review layer exists: two implementing agents and
+a passing test suite still shipped a real domain inaccuracy, in the exact subject this
+repo is meant to demonstrate. A reviewer with fresh eyes and a different vantage caught
+it before any human did. Production was then redeployed and re-verified end to end with
+Playwright against the live URL.
+
 ## Decisions made in this review
 
 - The public story names both agents. Pretending a single agent built this would be

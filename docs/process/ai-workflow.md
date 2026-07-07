@@ -48,3 +48,16 @@ That unplanned swap is the strongest evidence here for spec-driven development: 
 artifacts carried the intent, so the implementing agent was replaceable mid-project
 without losing direction. The full review record, including deviations accepted and why,
 is in docs/process/agent-handoff-review.md.
+
+## Adding the next feature
+
+The workflow is repeatable. To build on this repo:
+
+1. Promote an item from docs/product/roadmap.md, or write a new discovery insight into
+   a spec-ready brief.
+2. Start a new feature cycle: create `specs/002-<name>/` using the installed Spec Kit
+   skills (`.claude/skills/speckit-specify`, then speckit-plan, then speckit-tasks; the
+   scaffolding scripts live in `.specify/scripts/powershell/`).
+3. Implement task by task under the constitution's constraints. CLAUDE.md at the repo
+   root carries the binding rules for any agent session.
+4. Keep CI green and re-verify the live demo before merging to main.
