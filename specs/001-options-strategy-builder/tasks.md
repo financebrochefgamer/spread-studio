@@ -52,10 +52,10 @@ and state. User story work must wait until this phase is complete.
 
 **Independent Test**: Select each underlying, switch expirations, reload, and verify quote fields remain deterministic.
 
-- [ ] T018 [P] [US1] Build underlying and expiration controls in `components/UnderlyingPicker.tsx` and `components/ExpirationTabs.tsx`
-- [ ] T019 [P] [US1] Build the option chain table in `components/ChainTable.tsx`
-- [ ] T020 [US1] Wire the builder page chain workflow in `app/page.tsx`
-- [ ] T021 [US1] Track initial `page_view` and `chain_viewed` events in `app/page.tsx`
+- [x] T018 [P] [US1] Build underlying and expiration controls in `components/UnderlyingPicker.tsx` and `components/ExpirationTabs.tsx`
+- [x] T019 [P] [US1] Build the option chain table in `components/ChainTable.tsx`
+- [x] T020 [US1] Wire the builder page chain workflow in `app/page.tsx`
+- [x] T021 [US1] Track initial `page_view` and `chain_viewed` events in `app/page.tsx`
 
 **Checkpoint**: The app can display deterministic chains for all underlyings.
 
@@ -65,10 +65,10 @@ and state. User story work must wait until this phase is complete.
 
 **Independent Test**: Apply each template and verify created legs match the expected strategy shape.
 
-- [ ] T022 [P] [US2] Write template generation tests in `tests/unit/templates.test.ts`
-- [ ] T023 [US2] Implement all 9 strategy templates in `lib/strategies/templates.ts`
-- [ ] T024 [P] [US2] Build template selection controls in `components/TemplatePicker.tsx`
-- [ ] T025 [US2] Wire template selection and `template_selected` tracking in `lib/state/builder.ts` and `app/page.tsx`
+- [x] T022 [P] [US2] Write template generation tests in `tests/unit/templates.test.ts`
+- [x] T023 [US2] Implement all 9 strategy templates in `lib/strategies/templates.ts`
+- [x] T024 [P] [US2] Build template selection controls in `components/TemplatePicker.tsx`
+- [x] T025 [US2] Wire template selection and `template_selected` tracking in `lib/state/builder.ts` and `app/page.tsx`
 
 **Checkpoint**: The trader can build each template from the builder UI.
 
@@ -78,10 +78,10 @@ and state. User story work must wait until this phase is complete.
 
 **Independent Test**: Add a leg from the chain, edit side and quantity, then remove it and verify the strategy updates.
 
-- [ ] T026 [P] [US3] Build the leg editor in `components/LegEditor.tsx`
-- [ ] T027 [US3] Add chain-to-strategy leg actions in `components/ChainTable.tsx`
-- [ ] T028 [US3] Add leg add, update, and remove actions with `leg_edited` tracking in `lib/state/builder.ts`
-- [ ] T029 [US3] Integrate custom leg editing into the builder layout in `app/page.tsx`
+- [x] T026 [P] [US3] Build the leg editor in `components/LegEditor.tsx`
+- [x] T027 [US3] Add chain-to-strategy leg actions in `components/ChainTable.tsx`
+- [x] T028 [US3] Add leg add, update, and remove actions with `leg_edited` tracking in `lib/state/builder.ts`
+- [x] T029 [US3] Integrate custom leg editing into the builder layout in `app/page.tsx`
 
 **Checkpoint**: Custom strategy construction works without templates.
 
@@ -91,10 +91,10 @@ and state. User story work must wait until this phase is complete.
 
 **Independent Test**: Build single-leg, vertical, and iron condor strategies and verify metrics update live.
 
-- [ ] T030 [P] [US4] Build the payoff chart in `components/PayoffChart.tsx`
-- [ ] T031 [P] [US4] Build metrics and Greeks tables in `components/MetricsGrid.tsx` and `components/GreeksTable.tsx`
-- [ ] T032 [US4] Build the analysis panel in `components/AnalysisPanel.tsx`
-- [ ] T033 [US4] Wire live analysis and `strategy_analyzed` tracking in `components/AnalysisPanel.tsx` and `app/page.tsx`
+- [x] T030 [P] [US4] Build the payoff chart in `components/PayoffChart.tsx`
+- [x] T031 [P] [US4] Build metrics and Greeks tables in `components/MetricsGrid.tsx` and `components/GreeksTable.tsx`
+- [x] T032 [US4] Build the analysis panel in `components/AnalysisPanel.tsx`
+- [x] T033 [US4] Wire live analysis and `strategy_analyzed` tracking in `components/AnalysisPanel.tsx` and `app/page.tsx`
 
 **Checkpoint**: The live risk picture is visible for any valid strategy.
 
@@ -104,10 +104,10 @@ and state. User story work must wait until this phase is complete.
 
 **Independent Test**: Build a strategy, confirm the ticket, navigate to Orders, and verify the order appears.
 
-- [ ] T034 [P] [US5] Build the order ticket modal in `components/OrderTicketModal.tsx`
-- [ ] T035 [US5] Wire order ticket open and confirm flows in `components/AnalysisPanel.tsx` and `components/OrderTicketModal.tsx`
-- [ ] T036 [US5] Build simulated order history in `app/orders/page.tsx`
-- [ ] T037 [US5] Track `order_ticket_opened` and `order_placed` events in `components/AnalysisPanel.tsx` and `components/OrderTicketModal.tsx`
+- [x] T034 [P] [US5] Build the order ticket modal in `components/OrderTicketModal.tsx`
+- [x] T035 [US5] Wire order ticket open and confirm flows in `components/AnalysisPanel.tsx` and `components/OrderTicketModal.tsx`
+- [x] T036 [US5] Build simulated order history in `app/orders/page.tsx`
+- [x] T037 [US5] Track `order_ticket_opened` and `order_placed` events in `components/AnalysisPanel.tsx` and `components/OrderTicketModal.tsx`
 
 **Checkpoint**: Simulated order flow is complete.
 
@@ -117,8 +117,8 @@ and state. User story work must wait until this phase is complete.
 
 **Independent Test**: Save a custom strategy, leave the builder, reload the strategy, and verify legs and analysis return.
 
-- [ ] T038 [US6] Add save strategy controls and `strategy_saved` tracking in `components/AnalysisPanel.tsx`
-- [ ] T039 [US6] Add saved strategy list and reload actions in `app/orders/page.tsx` and `lib/state/builder.ts`
+- [x] T038 [US6] Add save strategy controls and `strategy_saved` tracking in `components/AnalysisPanel.tsx`
+- [x] T039 [US6] Add saved strategy list and reload actions in `app/orders/page.tsx` and `lib/state/builder.ts`
 
 **Checkpoint**: Saved strategy round trip works locally.
 
@@ -128,8 +128,8 @@ and state. User story work must wait until this phase is complete.
 
 **Independent Test**: Complete a builder-to-order flow, open analytics, and verify live session counts update.
 
-- [ ] T040 [US7] Build analytics dashboard with funnel and template popularity in `app/analytics/page.tsx`
-- [ ] T041 [US7] Audit all event firing sites against `docs/product/success-metrics.md`
+- [x] T040 [US7] Build analytics dashboard with funnel and template popularity in `app/analytics/page.tsx`
+- [x] T041 [US7] Audit all event firing sites against `docs/product/success-metrics.md`
 
 **Checkpoint**: The analytics dashboard proves the tracking plan.
 
