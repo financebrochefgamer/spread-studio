@@ -5,7 +5,7 @@
 A multi-leg options strategy builder, spec'd by a product manager and built by AI agents
 using GitHub Spec Kit, Claude Code, and Codex.
 
-**Live demo:** pending deployment
+**Live demo:** https://spread-studio.vercel.app
 
 ![Builder](docs/images/builder.png)
 

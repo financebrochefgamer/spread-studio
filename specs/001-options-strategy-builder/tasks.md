@@ -145,7 +145,7 @@ and state. User story work must wait until this phase is complete.
 - [x] T047 Capture README screenshots in `docs/images/`
 - [x] T048 Add remote-base-url e2e support in `playwright.config.ts`
 - [x] T049 Publish to GitHub and update README badge in `README.md`
-- [ ] T050 Deploy to Vercel and update live demo URL in `README.md`
+- [x] T050 Deploy to Vercel and update live demo URL in `README.md`
 - [ ] T051 Verify production with Playwright against `PLAYWRIGHT_BASE_URL`
 - [x] T052 Create local interview talking points in `D:\spread-studio-notes\interview-talking-points.md`
 
