@@ -181,3 +181,11 @@ adjacent claim also being true.
   said, only that it fired under the right conditions. A different kind of pass
   (reading every user-facing string against an outside standard) is not redundant
   with correctness review; it catches a different class of defect entirely.
+- 2026-07-08: Product strategy now lives in one north-star doc
+  (docs/product/vision.md) wired into every governing layer: constitution
+  Principle VIII, CLAUDE.md's process section, the spec queue's pillar/arc
+  tags, and the roadmap. Feature specs must name the pillar and arc they
+  advance or be rejected at spec review. The lesson is the mechanism, not the
+  mission: a one-time strategic decision only survives across sessions when it
+  is written into the files an agent must read before planning, the same
+  pattern as this lessons log itself.
