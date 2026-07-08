@@ -45,24 +45,24 @@ describe('lib/persist/workingOrders', () => {
     expect(read[0].status).toBe('working');
   });
 
-  it('test 7: cancelWorkingOrder sets status to canceled; a second call is a no-op', () => {
+  it('test 7: cancelWorkingOrder sets status to canceled and returns true; a second call is a no-op and returns false', () => {
     const order = makeWorkingOrder('wo-2');
     addWorkingOrder(order);
 
-    cancelWorkingOrder('wo-2');
+    expect(cancelWorkingOrder('wo-2')).toBe(true);
     expect(readWorkingOrders().find((item) => item.id === 'wo-2')?.status).toBe('canceled');
 
-    // Idempotent: second cancel on an already-canceled order is a no-op.
-    cancelWorkingOrder('wo-2');
+    // Idempotent: second cancel on an already-canceled order is a no-op, signaled by the false return.
+    expect(cancelWorkingOrder('wo-2')).toBe(false);
     expect(readWorkingOrders().find((item) => item.id === 'wo-2')?.status).toBe('canceled');
     expect(readWorkingOrders()).toHaveLength(1);
   });
 
-  it('test 8: cancelWorkingOrder on a nonexistent id is a no-op, no error, no state change', () => {
+  it('test 8: cancelWorkingOrder on a nonexistent id is a no-op, returns false, no error, no state change', () => {
     const order = makeWorkingOrder('wo-3');
     addWorkingOrder(order);
 
-    expect(() => cancelWorkingOrder('does-not-exist')).not.toThrow();
+    expect(cancelWorkingOrder('does-not-exist')).toBe(false);
     expect(readWorkingOrders()).toEqual([order]);
   });
 });

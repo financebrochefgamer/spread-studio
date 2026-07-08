@@ -26,8 +26,10 @@ export default function OrdersPage() {
   }, []);
 
   const cancelWorking = (order: WorkingOrder) => {
-    cancelWorkingOrder(order.id);
-    track('working_order_canceled', { underlying: order.underlyingSymbol, legs: order.legs.length });
+    const canceled = cancelWorkingOrder(order.id);
+    if (canceled) {
+      track('working_order_canceled', { underlying: order.underlyingSymbol, legs: order.legs.length });
+    }
     setWorkingOrders(readWorkingOrders());
   };
 

@@ -31,9 +31,13 @@ export function addWorkingOrder(order: WorkingOrder): void {
   writeWorkingOrders([order, ...readWorkingOrders()]);
 }
 
-export function cancelWorkingOrder(id: string): void {
+// Returns true only when a working order genuinely transitioned to canceled, so a
+// caller can gate a one-time side effect (e.g. an analytics event) on a real state
+// change rather than firing it on every click, including idempotent no-ops.
+export function cancelWorkingOrder(id: string): boolean {
   const orders = readWorkingOrders();
   const target = orders.find((order) => order.id === id);
-  if (!target || target.status === 'canceled') return;
+  if (!target || target.status === 'canceled') return false;
   writeWorkingOrders(orders.map((order) => (order.id === id ? { ...order, status: 'canceled' } : order)));
+  return true;
 }
