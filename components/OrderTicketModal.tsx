@@ -28,6 +28,14 @@ function makeId(): string {
   return `order-${Math.random().toString(36).slice(2)}`;
 }
 
+// Human-readable leg description for user-facing text (e.g. risk warnings).
+// Never surface a leg's internal id directly to the trader.
+function describeLeg(leg: Leg): string {
+  if (leg.instrument === 'stock') return 'Stock';
+  const kind = leg.instrument === 'call' ? 'Call' : 'Put';
+  return `${formatNumber(leg.strike ?? 0, 2)} ${kind}`;
+}
+
 export function OrderTicketModal({ open, underlyingSymbol, expiration, legs, analysis, onClose }: Props) {
   const [placed, setPlaced] = useState(false);
   const [orderType, setOrderType] = useState<OrderType>('market');
@@ -191,6 +199,7 @@ export function OrderTicketModal({ open, underlyingSymbol, expiration, legs, ana
                 }
                 onClick={() => setTimeInForce('gtc')}
                 disabled={placed}
+                title="Good-Til-Canceled"
                 type="button"
               >
                 GTC
@@ -209,7 +218,16 @@ export function OrderTicketModal({ open, underlyingSymbol, expiration, legs, ana
               {wideSpreadWarnings.length > 0 && (
                 <div data-testid="risk-warning-wide-spread" className="flex items-start gap-2 rounded border border-amber-700 bg-amber-950/40 p-2 text-xs text-amber-300">
                   <TriangleAlert size={14} aria-hidden="true" className="mt-0.5 shrink-0" />
-                  <span>Wide spread on leg(s): {wideSpreadWarnings.map((warning) => warning.legId).join(', ')}.</span>
+                  <span>
+                    Wide spread on leg(s):{' '}
+                    {wideSpreadWarnings
+                      .map((warning) => {
+                        const leg = legs.find((candidate) => candidate.id === warning.legId);
+                        return leg ? describeLeg(leg) : warning.legId;
+                      })
+                      .join(', ')}
+                    .
+                  </span>
                 </div>
               )}
               {complexWarning && (

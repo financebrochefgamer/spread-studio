@@ -8,7 +8,7 @@ export function Nav() {
       </Link>
       <div className="flex items-center gap-1 text-sm">
         <Link className="rounded px-3 py-1.5 text-zinc-300 hover:bg-zinc-900 hover:text-zinc-50" href="/">
-          Builder
+          Trade
         </Link>
         <Link data-testid="nav-positions" className="rounded px-3 py-1.5 text-zinc-300 hover:bg-zinc-900 hover:text-zinc-50" href="/positions">
           Positions

@@ -20,6 +20,8 @@ const LIVE_EVENTS: EventName[] = [
   'strategy_saved',
   'scenario_adjusted',
   'position_closed',
+  'working_order_placed',
+  'working_order_canceled',
 ];
 
 export default function AnalyticsPage() {
@@ -81,7 +83,7 @@ export default function AnalyticsPage() {
             <tbody>
               {LIVE_EVENTS.map((name) => (
                 <tr key={name} className="border-t border-zinc-900 first:border-t-0">
-                  <td className="py-2 text-zinc-400">{name}</td>
+                  <td className="py-2 text-zinc-400">{labelFromId(name)}</td>
                   <td data-testid={`live-${name}`} className="num py-2 text-zinc-100">
                     {liveCounts[name] ?? 0}
                   </td>

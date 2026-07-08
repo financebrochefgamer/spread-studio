@@ -63,7 +63,7 @@ export default function OrdersPage() {
                       <td className="num px-3 py-2">{order.legs.length}</td>
                       <td className="num px-3 py-2">{formatCurrency(order.netPremium)}</td>
                       <td className="px-3 py-2 text-zinc-500 capitalize">{order.orderType ?? 'market'}</td>
-                      <td className="px-3 py-2 text-zinc-500 uppercase">{order.timeInForce ?? 'day'}</td>
+                      <td className="px-3 py-2 text-zinc-500 uppercase" title={(order.timeInForce ?? 'day') === 'gtc' ? 'Good-Til-Canceled' : undefined}>{order.timeInForce ?? 'day'}</td>
                       <td className="px-3 py-2 text-zinc-500">{new Date(order.createdAt).toLocaleString()}</td>
                     </tr>
                   ))
@@ -74,7 +74,7 @@ export default function OrdersPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="text-lg font-semibold">Saved</h2>
+          <h2 className="text-lg font-semibold">Saved Strategies</h2>
           <div className="space-y-2">
             {strategies.length === 0 ? (
               <div className="rounded border border-zinc-800 p-4 text-sm text-zinc-500">No saved strategies</div>
@@ -130,7 +130,7 @@ export default function OrdersPage() {
                         <td className="px-3 py-2 font-semibold">{order.underlyingSymbol}</td>
                         <td className="num px-3 py-2">{order.legs.length}</td>
                         <td className="num px-3 py-2">{formatCurrency(order.netLimitPrice)}</td>
-                        <td className="px-3 py-2 text-zinc-500 uppercase">{order.timeInForce}</td>
+                        <td className="px-3 py-2 text-zinc-500 uppercase" title={order.timeInForce === 'gtc' ? 'Good-Til-Canceled' : undefined}>{order.timeInForce}</td>
                         <td className="px-3 py-2 text-zinc-500">{new Date(order.createdAt).toLocaleString()}</td>
                         <td className="px-3 py-2 text-right">
                           <button

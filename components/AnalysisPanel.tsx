@@ -1,6 +1,6 @@
 'use client';
 
-import { Save, Ticket } from 'lucide-react';
+import { ClipboardCheck, Save } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import type { Leg, TemplateId } from '@/lib/types';
 import { analyzeStrategy } from '@/lib/payoff/payoff';
@@ -53,7 +53,7 @@ export function AnalysisPanel({ underlyingSymbol, expiration, legs, templateId }
   };
 
   if (!hasLegs) {
-    return <div className="rounded border border-zinc-800 bg-zinc-950 p-4 text-sm text-zinc-500">Analysis waits for the first leg.</div>;
+    return <div className="rounded border border-zinc-800 bg-zinc-950 p-4 text-sm text-zinc-500">Add a leg to see its risk and payoff.</div>;
   }
 
   return (
@@ -79,8 +79,8 @@ export function AnalysisPanel({ underlyingSymbol, expiration, legs, templateId }
           onClick={openTicket}
           type="button"
         >
-          <Ticket size={15} aria-hidden="true" />
-          Ticket
+          <ClipboardCheck size={15} aria-hidden="true" />
+          Review Order
         </button>
       </div>
       <OrderTicketModal

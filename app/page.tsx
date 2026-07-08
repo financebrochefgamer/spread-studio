@@ -44,7 +44,7 @@ export default function BuilderPage() {
           <section className="space-y-3">
             <div className="flex items-end justify-between gap-3">
               <div>
-                <h1 className="text-lg font-semibold">Builder</h1>
+                <h1 className="text-lg font-semibold">Trade</h1>
                 <div className="text-xs text-zinc-500">
                   {underlying.name} · {formatCurrency(underlying.spot)}
                 </div>
@@ -70,7 +70,7 @@ export default function BuilderPage() {
             <LegEditor legs={legs} onUpdate={updateLeg} onRemove={removeLeg} />
           </section>
           <section className="space-y-3">
-            <h2 className="text-sm font-semibold text-zinc-200">Risk</h2>
+            <h2 className="text-sm font-semibold text-zinc-200">Analysis</h2>
             <AnalysisPanel underlyingSymbol={underlyingSymbol} expiration={expiration} legs={legs} templateId={templateId} />
           </section>
         </aside>

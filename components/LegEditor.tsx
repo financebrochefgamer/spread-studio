@@ -36,7 +36,7 @@ export function LegEditor({ legs, onUpdate, onRemove }: Props) {
               {leg.instrument === 'stock' ? 'Stock' : `${leg.instrument} ${formatNumber(leg.strike ?? 0, 2)}`}
             </div>
             <div className="truncate text-zinc-500">
-              {leg.instrument === 'stock' ? formatCurrency(leg.stockPrice ?? 0) : `${leg.expiration} mid ${formatNumber(leg.quote?.mid ?? 0)}`}
+              {leg.instrument === 'stock' ? formatCurrency(leg.stockPrice ?? 0) : `${leg.expiration} · Mid ${formatCurrency(leg.quote?.mid ?? 0)}`}
             </div>
           </div>
           <input

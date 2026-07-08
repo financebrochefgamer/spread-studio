@@ -65,7 +65,7 @@ export default function PositionsPage() {
 
           {!hasOpenPositions ? (
             <div data-testid="positions-empty" className="rounded border border-zinc-800 p-6 text-center text-sm text-zinc-500">
-              No open positions yet. Place an order from the Builder to see it here.
+              No open positions. Place an order from Trade to open one.
             </div>
           ) : (
             <>
