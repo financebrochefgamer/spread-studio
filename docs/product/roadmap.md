@@ -7,9 +7,10 @@ Date: 2026-07-06. Vision anchor added 2026-07-08.
 docs/product/vision.md is the product north star. Future work organizes under
 its four ambition arcs: Arc 1 Strategy Intelligence depth, Arc 2 Trader
 Development arena, Arc 3 Agentic platform, Arc 4 Breadth and reach. The
-version-numbered sections below are the historical record of how v1 through v5
-shipped. New items land in docs/product/spec-queue.md tagged with a pillar and
-arc, not in new version sections here.
+version-numbered sections below are the historical record of the v1 through v5
+build cycles; some items in them remain deferred. New items land in
+docs/product/spec-queue.md tagged with a pillar and arc, not in new version
+sections here.
 
 ## v1: Strategy Builder MVP
 
@@ -90,6 +91,9 @@ demo with CI green.
 - Alerts and mobile layout.
 
 Each item graduates by getting its own spec under specs/NNN-name/ before any code.
+The open items above are now tracked as pillar/arc-tagged candidates in
+docs/product/spec-queue.md; this section is retained as historical context for
+how the scope call was originally framed.
 
 ## Spec queue and role-alignment gap analysis
 
