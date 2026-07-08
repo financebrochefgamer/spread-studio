@@ -11,6 +11,8 @@ export const EVENT_NAMES: EventName[] = [
   'strategy_saved',
   'scenario_adjusted',
   'position_closed',
+  'working_order_placed',
+  'working_order_canceled',
 ];
 
 export const FUNNEL_STAGES = ['chain_viewed', 'strategy_built', 'strategy_analyzed', 'order_placed', 'position_closed'] as const;

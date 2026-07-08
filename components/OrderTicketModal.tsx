@@ -1,11 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Check } from 'lucide-react';
-import type { Leg, Order } from '@/lib/types';
+import { Check, TriangleAlert } from 'lucide-react';
+import type { AnalysisResult, Leg, Order, WorkingOrder } from '@/lib/types';
 import { addOrder } from '@/lib/persist/orders';
+import { addWorkingOrder } from '@/lib/persist/workingOrders';
 import { track } from '@/lib/analytics/store';
 import { strategyNetPremium } from '@/lib/payoff/payoff';
+import { isMarketable } from '@/lib/orders/marketability';
+import { getRiskWarnings } from '@/lib/orders/riskWarnings';
 import { formatCurrency, formatNumber } from '@/lib/format';
 
 interface Props {
@@ -13,36 +16,77 @@ interface Props {
   underlyingSymbol: string;
   expiration: string;
   legs: Leg[];
+  analysis: AnalysisResult;
   onClose: () => void;
 }
+
+type OrderType = 'market' | 'limit';
+type TimeInForce = 'day' | 'gtc';
 
 function makeId(): string {
   if (typeof window !== 'undefined' && window.crypto?.randomUUID) return window.crypto.randomUUID();
   return `order-${Math.random().toString(36).slice(2)}`;
 }
 
-export function OrderTicketModal({ open, underlyingSymbol, expiration, legs, onClose }: Props) {
+export function OrderTicketModal({ open, underlyingSymbol, expiration, legs, analysis, onClose }: Props) {
   const [placed, setPlaced] = useState(false);
+  const [orderType, setOrderType] = useState<OrderType>('market');
+  const [limitPriceInput, setLimitPriceInput] = useState('');
+  const [timeInForce, setTimeInForce] = useState<TimeInForce>('day');
 
   useEffect(() => {
-    if (open) setPlaced(false);
+    if (open) {
+      setPlaced(false);
+      setOrderType('market');
+      setLimitPriceInput('');
+      setTimeInForce('day');
+    }
   }, [open]);
 
   if (!open) return null;
-  const netPremium = strategyNetPremium(legs);
+  const netMid = strategyNetPremium(legs);
+  const parsedLimitPrice = limitPriceInput.trim() === '' ? NaN : Number(limitPriceInput);
+  const hasValidLimitPrice = Number.isFinite(parsedLimitPrice);
+  const warnings = getRiskWarnings(legs, analysis);
+  const unlimitedWarning = warnings.find((warning) => warning.kind === 'unlimited_risk');
+  const wideSpreadWarnings = warnings.filter((warning) => warning.kind === 'wide_spread');
+  const complexWarning = warnings.find((warning) => warning.kind === 'complex_order');
+
+  const canConfirm = !placed && (orderType === 'market' || hasValidLimitPrice);
 
   const confirm = () => {
-    if (placed) return;
+    if (!canConfirm) return;
+
+    if (orderType === 'limit' && !isMarketable(netMid, parsedLimitPrice)) {
+      const workingOrder: WorkingOrder = {
+        id: makeId(),
+        createdAt: new Date().toISOString(),
+        underlyingSymbol,
+        expiration,
+        legs,
+        netLimitPrice: parsedLimitPrice,
+        timeInForce,
+        status: 'working',
+      };
+      addWorkingOrder(workingOrder);
+      track('working_order_placed', { underlying: underlyingSymbol, legs: legs.length, net_limit_price: parsedLimitPrice });
+      onClose();
+      return;
+    }
+
+    // Market order, or a marketable limit: fills now at netMid, never at the trader's limit.
     const order: Order = {
       id: makeId(),
       createdAt: new Date().toISOString(),
       underlyingSymbol,
       expiration,
       legs,
-      netPremium,
+      netPremium: netMid,
+      orderType,
+      timeInForce,
     };
     addOrder(order);
-    track('order_placed', { underlying: underlyingSymbol, legs: legs.length, net_premium: netPremium });
+    track('order_placed', { underlying: underlyingSymbol, legs: legs.length, net_premium: netMid });
     setPlaced(true);
   };
 
@@ -58,7 +102,7 @@ export function OrderTicketModal({ open, underlyingSymbol, expiration, legs, onC
         <div className="space-y-3 p-4">
           <div className="flex justify-between text-sm">
             <span className="text-zinc-500">{underlyingSymbol}</span>
-            <span className="num font-semibold">{formatCurrency(netPremium)}</span>
+            <span className="num font-semibold">{formatCurrency(netMid)}</span>
           </div>
           <div className="divide-y divide-zinc-900 rounded border border-zinc-800">
             {legs.map((leg) => (
@@ -71,15 +115,121 @@ export function OrderTicketModal({ open, underlyingSymbol, expiration, legs, onC
               </div>
             ))}
           </div>
+
+          <div className="space-y-2">
+            <div className="text-xs font-semibold text-zinc-500">Order type</div>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                data-testid="order-type-market"
+                className={
+                  orderType === 'market'
+                    ? 'rounded border border-sky-400 bg-sky-500/10 px-3 py-2 text-sm font-semibold text-sky-300'
+                    : 'rounded border border-zinc-700 px-3 py-2 text-sm text-zinc-300 hover:border-zinc-500'
+                }
+                onClick={() => setOrderType('market')}
+                disabled={placed}
+                type="button"
+              >
+                Market
+              </button>
+              <button
+                data-testid="order-type-limit"
+                className={
+                  orderType === 'limit'
+                    ? 'rounded border border-sky-400 bg-sky-500/10 px-3 py-2 text-sm font-semibold text-sky-300'
+                    : 'rounded border border-zinc-700 px-3 py-2 text-sm text-zinc-300 hover:border-zinc-500'
+                }
+                onClick={() => setOrderType('limit')}
+                disabled={placed}
+                type="button"
+              >
+                Limit
+              </button>
+            </div>
+          </div>
+
+          {orderType === 'limit' && (
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-zinc-500" htmlFor="limit-price-input">
+                Net limit price (debit positive, credit negative)
+              </label>
+              <input
+                id="limit-price-input"
+                data-testid="limit-price-input"
+                className="w-full rounded border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 num"
+                type="number"
+                step="0.01"
+                value={limitPriceInput}
+                onChange={(event) => setLimitPriceInput(event.target.value)}
+                disabled={placed}
+              />
+            </div>
+          )}
+
+          <div className="space-y-2">
+            <div className="text-xs font-semibold text-zinc-500">Time in force</div>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                data-testid="time-in-force-day"
+                className={
+                  timeInForce === 'day'
+                    ? 'rounded border border-sky-400 bg-sky-500/10 px-3 py-2 text-sm font-semibold text-sky-300'
+                    : 'rounded border border-zinc-700 px-3 py-2 text-sm text-zinc-300 hover:border-zinc-500'
+                }
+                onClick={() => setTimeInForce('day')}
+                disabled={placed}
+                type="button"
+              >
+                Day
+              </button>
+              <button
+                data-testid="time-in-force-gtc"
+                className={
+                  timeInForce === 'gtc'
+                    ? 'rounded border border-sky-400 bg-sky-500/10 px-3 py-2 text-sm font-semibold text-sky-300'
+                    : 'rounded border border-zinc-700 px-3 py-2 text-sm text-zinc-300 hover:border-zinc-500'
+                }
+                onClick={() => setTimeInForce('gtc')}
+                disabled={placed}
+                type="button"
+              >
+                GTC
+              </button>
+            </div>
+          </div>
+
+          {(unlimitedWarning || wideSpreadWarnings.length > 0 || complexWarning) && (
+            <div className="space-y-2">
+              {unlimitedWarning && (
+                <div data-testid="risk-warning-unlimited" className="flex items-start gap-2 rounded border border-amber-700 bg-amber-950/40 p-2 text-xs text-amber-300">
+                  <TriangleAlert size={14} aria-hidden="true" className="mt-0.5 shrink-0" />
+                  <span>Unlimited risk: this strategy&apos;s max profit or max loss is unbounded.</span>
+                </div>
+              )}
+              {wideSpreadWarnings.length > 0 && (
+                <div data-testid="risk-warning-wide-spread" className="flex items-start gap-2 rounded border border-amber-700 bg-amber-950/40 p-2 text-xs text-amber-300">
+                  <TriangleAlert size={14} aria-hidden="true" className="mt-0.5 shrink-0" />
+                  <span>Wide spread on leg(s): {wideSpreadWarnings.map((warning) => warning.legId).join(', ')}.</span>
+                </div>
+              )}
+              {complexWarning && (
+                <div data-testid="risk-warning-complex" className="flex items-start gap-2 rounded border border-amber-700 bg-amber-950/40 p-2 text-xs text-amber-300">
+                  <TriangleAlert size={14} aria-hidden="true" className="mt-0.5 shrink-0" />
+                  <span>Complex order: this strategy has more than 4 legs.</span>
+                </div>
+              )}
+            </div>
+          )}
+
           <button
             data-testid="confirm-order"
             className={
               placed
                 ? 'inline-flex w-full cursor-default items-center justify-center gap-2 rounded bg-emerald-600 px-3 py-2 text-sm font-semibold text-zinc-950'
-                : 'inline-flex w-full items-center justify-center gap-2 rounded bg-sky-500 px-3 py-2 text-sm font-semibold text-zinc-950 hover:bg-sky-400'
+                : 'inline-flex w-full items-center justify-center gap-2 rounded bg-sky-500 px-3 py-2 text-sm font-semibold text-zinc-950 hover:bg-sky-400 disabled:cursor-not-allowed disabled:opacity-50'
             }
             onClick={confirm}
-            disabled={placed}
+            disabled={!canConfirm}
             type="button"
           >
             <Check size={16} aria-hidden="true" />
