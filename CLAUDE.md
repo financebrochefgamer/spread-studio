@@ -1,14 +1,17 @@
 # Spread Studio
 
-Deterministic, client-only multi-leg options strategy builder. Portfolio repo
-demonstrating spec-driven development with AI agents. Live: https://spread-studio.vercel.app
+AI-native derivatives strategy platform on a deterministic core, built by AI
+agents directed by one PM. North star: docs/product/vision.md.
+Live: https://spread-studio.vercel.app
 
 ## Non-negotiable constraints (from .specify/memory/constitution.md)
 
 - Spec first. No feature code without a spec section demanding it. New features get a
   new `specs/NNN-name/` cycle (spec, plan, tasks) before implementation.
-- Deterministic demo: no external APIs, no database, no auth, no Date.now() or
-  Math.random() in domain logic. Fixed market date lives in lib/market/constants.ts.
+- Deterministic core: no external APIs, database, or auth by default; no
+  Date.now() or Math.random() in domain logic. Fixed market date lives in
+  lib/market/constants.ts. Optional integrations only as off-by-default
+  adapters with a stated seam (constitution Principle II).
 - localStorage/sessionStorage only, always SSR-guarded and try/catch wrapped.
 - Event names and properties must match docs/product/success-metrics.md exactly. No
   untracked user-facing features.
@@ -36,6 +39,10 @@ demonstrating spec-driven development with AI agents. Live: https://spread-studi
 - `.claude/skills/speckit-*` installed Spec Kit skills; scaffolding scripts in `.specify/scripts/powershell/`
 
 ## Process
+
+Read docs/product/vision.md before proposing, spec'ing, or planning any
+feature; every feature spec must name the vision pillar and arc it advances
+(constitution Principle VIII).
 
 Read docs/process/playbook.md before starting any new feature; it is the living
 operating procedure (spec PR review session, model tiering, working-tree discipline)
