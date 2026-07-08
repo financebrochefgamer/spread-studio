@@ -165,9 +165,10 @@ is the part that makes future iterations inherit the vision automatically.
    Generic language. No company or posting names.
 2. `.specify/memory/constitution.md` (amend). Mission statement points to
    vision.md. Determinism reframed as "synthetic by default, real-ready by
-   design" with the adapter-seam requirement. New principle: every new spec's
-   header names the pillar and arc it advances; a spec that advances none is
-   rejected.
+   design" with the adapter-seam requirement. New principle: every new feature
+   spec's header names the pillar and arc it advances; a feature spec that
+   advances none is rejected. Process and docs artifacts cite the operating
+   model instead of a pillar.
 3. `CLAUDE.md` (amend). Add to the Process section: read docs/product/vision.md
    before proposing, spec'ing, or planning any feature. Same enforcement
    position as the playbook rule that already works.
@@ -178,10 +179,10 @@ is the part that makes future iterations inherit the vision automatically.
 6. `CLAUDE.local.md` (amend, private). Standing rules updated: platform vision
    is primary, career evidence is the byproduct. The "every addition must map
    to a posting requirement" rule is replaced by "every addition must advance a
-   vision pillar." Evidence map extended with the three leadership-level
-   TradeStation postings captured verbatim (AI Products & Platforms Director;
-   Product Management Director, Active Trader; Sr. Product Owner, Brokerage
-   Services).
+   vision pillar." Evidence map extended with three leadership-level posting
+   captures (an AI products and platforms director role, an active-trader
+   product director role, and a senior brokerage product owner role). The
+   verbatim captures live only in the private layer.
 7. `docs/process/playbook.md` (append lesson). Record the vision-anchoring
    decision: strategy lives in one north-star doc, and every governing layer
    points at it, so no future session can plan without it.
@@ -202,7 +203,7 @@ is the part that makes future iterations inherit the vision automatically.
   ranked spec-queue items and normal spec cycles. The queue, not the vision,
   decides what is next.
 - Vision drift risk: the constitution's pillar-citation rule is the guard. A
-  spec that cites no pillar is rejected at spec review.
+  feature spec that cites no pillar is rejected at spec review.
 - Determinism erosion risk: the adapter-seam principle is the guard. Any spec
   touching data or execution must state its seam.
 - Private/public leak risk: posting details stay in CLAUDE.local.md and
