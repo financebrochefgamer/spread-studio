@@ -16,6 +16,7 @@ context."
 | 004 | Analytics MCP server | "Self success measurement dashboards... internal MCP connections" (posting language) | specs/004-analytics-mcp-server, PR review across 2 rounds |
 | 005 | Amplitude adapter behind env flag | "Amplitude, Databricks, or similar" (posting language) | specs/005-amplitude-adapter, PR review across 3 rounds |
 | 006 | Broker-grade order entry | "Broker-dealer platform conventions, order entry UX" (posting language) | specs/006-broker-order-entry, spec PR review across 2 rounds (both caught a real inverted marketability rule, the third recurrence of this repo's signed-money sign-direction bug class), implementation PR review verified the fix by hand and independently confirmed a self-reported wide-spread finding against real generated data |
+| - | Trading platform terminology audit | "Appreciation for what VIP-level active trader UX looks like" (posting language) | docs/product/terminology-audit.md, 11 findings fixed including two real defects (raw internal leg ids leaking into a risk warning, raw event names unformatted in the analytics panel), verified against real broker-platform conventions (thinkorswim, TradeStation's own product vocabulary) before any rename, verified visually in a live dev session and in production |
 
 ## In progress
 
@@ -36,7 +37,6 @@ whether it will be built.
 | - | VIP-UX design philosophy note | "Appreciation for what VIP-level active trader UX looks like" (posting) | Low | None | Articulate existing dense/dark UI choices as deliberate, not default |
 | 009 | Margin and buying-power estimate | "Broker-dealer platform conventions" (posting) | Medium | None (006 shipped; margin display belongs on the same order-ticket surface it now provides) | Simplified, explicitly labeled estimate per strategy type |
 | 010 | Market data adapter | Domain realism | Low | Violates default determinism unless carefully scoped as an opt-in adapter, same pattern as 005 | Provider abstraction with a synthetic default, deferred until there's a concrete reason to add real data risk |
-| - | Trading platform terminology audit | "Appreciation for what VIP-level active trader UX looks like" (posting) | High | 006 shipped, so order-entry vocabulary can be audited alongside everything else | User-flagged: the "Builder" nav tab and the "Ticket" button read as generic, not active-trader platform language. Research real broker conventions (thinkorswim, IBKR, TradeStation where findable) before renaming. Covers P&L language, Greeks/IV labeling, risk-warning copy, strategy names. |
 
 ## Decisions pending (need a human call, not an agent default)
 

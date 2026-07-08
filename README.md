@@ -46,6 +46,7 @@ It is a working demonstration of spec-driven product development with AI agents.
 | [docs/product/roadmap.md](docs/product/roadmap.md) | What was deferred and why |
 | [docs/product/spec-queue.md](docs/product/spec-queue.md) | The living spec queue: shipped, in progress, and candidate work, ranked and evidenced |
 | [docs/product/role-gap-analysis.md](docs/product/role-gap-analysis.md) | The original gap analysis the spec queue and professional-development/ were split from |
+| [docs/product/terminology-audit.md](docs/product/terminology-audit.md) | Every user-facing string checked against real broker-platform conventions before renaming |
 
 The commit history reads oldest-first as: design, Spec Kit setup, product docs, spec,
 plan, tasks, then implementation. Spec 002 repeats the full cycle, including a public

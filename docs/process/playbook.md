@@ -172,3 +172,12 @@ adjacent claim also being true.
   formula, don't just trust the report) but treat an honest "the example was
   wrong, here's what's actually true" as evidence of a good implementer, not a
   yellow flag.
+- 2026-07-08: Correct math and correct tests do not guarantee a defect-free UI. A
+  terminology audit (checking that words match real broker-platform conventions,
+  not checking behavior at all) found a genuine bug that 56 passing tests and two
+  rounds of code review had missed: a risk warning printed a raw internal leg id
+  directly to the trader instead of a human-readable description. Nothing in the
+  spec, the tests, or the reviews ever exercised what the warning text actually
+  said, only that it fired under the right conditions. A different kind of pass
+  (reading every user-facing string against an outside standard) is not redundant
+  with correctness review; it catches a different class of defect entirely.
