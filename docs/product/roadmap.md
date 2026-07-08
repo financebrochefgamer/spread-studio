@@ -1,6 +1,15 @@
 # Roadmap
 
-Date: 2026-07-06
+Date: 2026-07-06. Vision anchor added 2026-07-08.
+
+## North star and arcs (2026-07-08 onward)
+
+docs/product/vision.md is the product north star. Future work organizes under
+its four ambition arcs: Arc 1 Strategy Intelligence depth, Arc 2 Trader
+Development arena, Arc 3 Agentic platform, Arc 4 Breadth and reach. The
+version-numbered sections below are the historical record of how v1 through v5
+shipped. New items land in docs/product/spec-queue.md tagged with a pillar and
+arc, not in new version sections here.
 
 ## v1: Strategy Builder MVP
 
