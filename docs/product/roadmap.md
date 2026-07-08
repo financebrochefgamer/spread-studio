@@ -49,6 +49,23 @@ demo with CI green.
   v2 above); the MCP server proves the "own dashboards" capability without needing a
   live vendor integration first.
 
+## v5: Broker-grade order entry
+
+- Market and limit orders, working orders, pre-trade risk warnings, time in force.
+  Shipped 2026-07-08 as specs/006-broker-order-entry. Directly targets the posting's
+  "broker-dealer platform conventions, order entry UX" and "what separates
+  professional-grade tools from consumer-grade experiences." Marketability is one
+  unbranched signed inequality (netMid <= netLimitPrice); a marketable order always
+  fills at netMid, never at the trader's limit. Ran the full cycle: spec PR reviewed
+  across two rounds, both of which caught real bugs (an inverted marketability rule
+  and a wrong fill-price claim, the third recurrence of this repo's signed-money
+  sign-direction bug class per docs/process/playbook.md), implementation reviewed
+  (the reviewer independently replicated the chain-generator formulas to verify a
+  self-reported wide-spread finding rather than trust it), deployed, and verified
+  end to end in production.
+- Margin and buying-power display now unblocked on the same order-ticket surface
+  (docs/product/spec-queue.md item 009).
+
 ## v3: Breadth
 
 - Futures chains and futures options. Margin and tick conventions differ enough to be

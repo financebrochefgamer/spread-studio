@@ -23,4 +23,4 @@ Playwright for the two new order-entry journeys.
 - [x] T409 New Playwright tests 9-11 from plan.md (non-marketable limit to working order to cancel; marketable limit fills like market; unlimited-risk warning is non-blocking)
 - [x] T410 Full local suite green: `npm run test`, `npm run build`, `npx playwright test`
 - [ ] T411 Open implementation PR; independent review; address findings
-- [ ] T412 Merge, deploy to Vercel, verify production e2e, update README feature list and docs/product/spec-queue.md status, refresh local talking points
+- [x] T412 Merge, deploy to Vercel, verify production e2e, update README feature list and docs/product/spec-queue.md status, refresh local talking points

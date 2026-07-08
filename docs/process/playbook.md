@@ -151,3 +151,24 @@ adjacent claim also being true.
   verification actually proves what the spec's acceptance criterion cared about,
   and treat a well-reasoned substitution as a legitimate part of implementation,
   not a deviation to be punished.
+- 2026-07-08: The signed-money sign/direction bug class recurred a fourth time,
+  now as an inverted marketability rule for market/limit orders, and was caught in
+  spec review before any code existed, same as the futures short-direction bug.
+  The rule that finally stopped it recurring was collapsing what looked like two
+  cases (debit, credit) into one signed inequality and requiring a worked example
+  for each case in the spec text itself, not just the formula. Two-case money
+  formulas are the highest-risk shape in this repo; the fix is almost always to
+  find the one correctly-signed inequality that covers both cases, because a
+  human (or agent) writing two separate branches for debit and credit is
+  exactly where the direction gets flipped on one of them without anyone noticing
+  until a reviewer traces a concrete number through it by hand.
+- 2026-07-08: An implementer who reports "the spec's acceptance criterion doesn't
+  hold universally, here's the real data and the workaround I used" is doing the
+  job correctly, not confessing a defect. A default template (AURA's iron condor)
+  legitimately tripped a risk-warning threshold the spec's example claimed would
+  stay clean; the implementer swapped the test fixture to an underlying that
+  genuinely stayed clean and reported why, rather than silently picking numbers
+  that made the test pass. Verify these claims independently (replicate the
+  formula, don't just trust the report) but treat an honest "the example was
+  wrong, here's what's actually true" as evidence of a good implementer, not a
+  yellow flag.

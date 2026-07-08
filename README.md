@@ -17,7 +17,10 @@ AI-first product development on an active-trader derivatives product.
 - Build strategies from 9 templates or leg by leg from the chain.
 - See payoff at expiration, breakevens, max profit/loss, net debit/credit, and Greeks
   while building.
-- Place simulated mid-price orders and review them in order history.
+- Place market or limit orders. A marketable limit fills like a market order; a
+  non-marketable limit becomes a working order you can review and cancel, not a
+  silent no-op. Pre-trade risk warnings (unlimited risk, wide spread, complex order)
+  show before you confirm, without blocking you.
 - Save and reload strategies.
 - Open /positions to see orders become open positions marked to model, stress them with
   a spot/vol/time scenario engine, and close them for realized P&L.
