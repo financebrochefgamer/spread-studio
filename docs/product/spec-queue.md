@@ -25,18 +25,27 @@ None currently.
 ## Candidate backlog
 
 Ranked by signal-to-effort. Confidence reflects how well-scoped the idea is today, not
-whether it will be built.
+whether it will be built. Pillar/arc values come from docs/product/vision.md: P1 is
+Strategy Intelligence, P2 is Trader Development, arcs 1-4 are the ambition arcs.
+Process artifacts carry "ops" instead of a pillar.
 
-| ID (tentative) | Title | Role signal | Confidence | Dependencies | Notes |
-| --- | --- | --- | --- | --- | --- |
-| 007 | Databricks event model | "Amplitude, Databricks, or similar" (posting) | High | None | Sample table schema (events_raw, events_clean, sessions) and real SQL against this repo's actual event shape, same pattern as the experiment memo |
-| 008 | KPI tree | "Measurable improvements in trade volume, post-trade visibility, and retention" (posting, verbatim) | High | None | Activity to activation to outcome to business-result model tied to this app's actual events |
-| - | Platform surface map | "Roadmap... across TITAN X, HUB, and Mobile" (posting) | Medium | None | Generic desktop/web/mobile framing, not TradeStation product names |
-| - | Competitive and AI-tooling watchlist | "Evaluate industry and competitive developments... proactively flag shifts" (posting) | Medium | None | Recurring-scan habit, not a one-time matrix |
-| - | Release brief (retroactive, for a past ship) | "Manage product launches... documentation generated efficiently using AI" (posting) | Medium | None | Demonstrates the artifact shape more than new capability |
-| - | VIP-UX design philosophy note | "Appreciation for what VIP-level active trader UX looks like" (posting) | Low | None | Articulate existing dense/dark UI choices as deliberate, not default |
-| 009 | Margin and buying-power estimate | "Broker-dealer platform conventions" (posting) | Medium | None (006 shipped; margin display belongs on the same order-ticket surface it now provides) | Simplified, explicitly labeled estimate per strategy type |
-| 010 | Market data adapter | Domain realism | Low | Violates default determinism unless carefully scoped as an opt-in adapter, same pattern as 005 | Provider abstraction with a synthetic default, deferred until there's a concrete reason to add real data risk |
+| ID (tentative) | Title | Pillar/arc | Role signal | Confidence | Dependencies | Notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| 007 | Databricks event model | ops | Analytics stack fluency | High | None | Sample table schema (events_raw, events_clean, sessions) and real SQL against this repo's actual event shape, same pattern as the experiment memo |
+| 008 | KPI tree | ops | Measurable business outcomes | High | None | Activity to activation to outcome to business-result model tied to this app's actual events |
+| 009 | Margin and buying-power estimate | P1 / Arc 1 | Broker-dealer platform conventions | Medium | None (006 shipped; margin display belongs on the order-ticket surface it provides) | Simplified, explicitly labeled estimate per strategy type |
+| 010 | Market data adapter | P1 / Arc 1 | Domain realism | Low | Constitution Principle II adapter-seam rules | Provider abstraction with a synthetic default; the reference real-ready seam |
+| 011 | Multi-expiration payoff modeling | P1 / Arc 1 | Calendars and diagonals; the known hard problem | Medium | Pricing model valuation of the far leg at near expiration | Unlocks calendar and diagonal templates |
+| 012 | Vol-surface and IV-context visualization | P1 / Arc 1 | Options analytics depth | Medium | None | Skew and term structure the chain generator already encodes, made visible |
+| 013 | Strategy comparison | P1 / Arc 1 | Decision support | Medium | None | Side-by-side candidate structures on one payoff and Greeks view |
+| 014 | Replayable market days | P2 / Arc 2 | Practice arena core | Medium | Scenario engine (002, shipped) | Deterministic scripted market paths a trader can rerun |
+| 015 | Trade journal and performance analytics | P2 / Arc 2 | Retention and engagement | Medium | Positions history (002, shipped) | Journal entries attached to orders and positions, stats over simulated history |
+| 016 | Agentic MCP control surface | P1+P2 / Arc 3 | Agentic brokerage wave | Medium | MCP server (004, shipped) | Build, analyze, stress, and order via the user's own agent; guardrails and audit log required |
+| 017 | Strategy copilot adapter | P1 / Arc 3 | Customer-facing AI | Low | 016 preferred first | Natural-language strategy help behind an env flag, Amplitude adapter pattern |
+| - | Platform surface map | ops | Cross-surface roadmap | Medium | None | Generic desktop/web/mobile framing |
+| - | Competitive and AI-tooling watchlist | ops | Industry awareness | Medium | None | Recurring-scan habit, not a one-time matrix |
+| - | Release brief (retroactive, for a past ship) | ops | Launch documentation | Medium | None | Demonstrates the artifact shape more than new capability |
+| - | VIP-UX design philosophy note | ops | Professional-grade UX | Low | None | Articulate existing dense/dark UI choices as deliberate, not default |
 
 ## Decisions pending (need a human call, not an agent default)
 
